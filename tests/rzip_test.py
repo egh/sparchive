@@ -1,5 +1,5 @@
 import os
-from sparxiv import rzip
+from sparxive import rzip
 from unittest import TestCase
 from nose.tools import assert_equal
 import hashlib
