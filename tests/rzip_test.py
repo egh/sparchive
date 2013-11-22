@@ -3,13 +3,12 @@ from sparxive import rzip
 from unittest import TestCase
 from nose.tools import assert_equal
 import hashlib
-from tempfile import mkstemp
+from sparxive import mkstemppath
 
 class TestRzip(TestCase):
     def test_compress_file(self):
         p = os.path.join('tests', 'fixtures', 'foo')
-        (_, prz) = mkstemp()
-        os.unlink(prz)
+        prz = mkstemppath()
         assert(os.path.exists(p))
         assert(not(os.path.exists(prz)))
         rzip.compress(p, prz)
@@ -19,10 +18,8 @@ class TestRzip(TestCase):
 
     def test_uncompress_file(self):
         p = os.path.join('tests', 'fixtures', 'foo')
-        (_, prz) = mkstemp()
-        os.unlink(prz)
-        (_, pr2) = mkstemp()
-        os.unlink(pr2)
+        prz = mkstemppath()
+        pr2 = mkstemppath()
         rzip.compress(p, prz)
         rzip.uncompress(prz, pr2)
         
