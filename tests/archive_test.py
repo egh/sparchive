@@ -22,7 +22,7 @@ class TestArchive(TestCase):
                 assert_equal(filenames, [ info.filename for info in myzip.infolist() ])
         
     def test_get_mtime(self):
-        assert_equal(time.ctime(1385061271), get_mtime(os.path.join('tests', 'fixtures')))
+        assert_equal(time.gmtime(1385192191), get_mtime('foobar'))
 
     def test_add_file(self):
         foo = os.path.join('foobar', 'foo')

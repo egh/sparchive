@@ -12,7 +12,7 @@ def get_mtime(path):
                 handle(os.path.join(path, name), times)
         elif os.path.isfile(path):
             # check if boring
-            times.append(time.ctime(os.path.getmtime(path)))
+            times.append(time.gmtime(os.path.getmtime(path)))
 
     times = []
     handle(path, times)
