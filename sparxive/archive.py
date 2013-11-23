@@ -1,3 +1,4 @@
+from datetime import datetime
 from sparxive import rzip
 from sparxive import mkstemppath
 import re
@@ -24,12 +25,12 @@ class Archive(object):
     def __init__(self, archive_path):
         self.archive_path = archive_path
 
-    def _get_info_version(self, info):
-        """Returns the version number from a ZipInfo."""
-        md = re.match(r"^([0-9]+)/", info.filename)
+    def _split_path(self, info):
+        """Splits a ZipInfo path into a versionnumber, path tuple."""
+        md = re.match(r"^([0-9]+)/(.*)$", info.filename)
         if md is None:
             raise Exception()
-        return int(md.group(1))
+        return (int(md.group(1)), md.group(2))
         
     def get_version_count(self, zippath):
         if not(os.path.exists(zippath)):
@@ -38,7 +39,7 @@ class Archive(object):
             version_count = 0
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 for info in myzip.infolist():
-                    this_version = self._get_info_version(info)
+                    this_version = self._split_path(info)[0]
                     if (this_version+1) > version_count:
                         version_count = (this_version+1)
             return version_count
@@ -77,5 +78,16 @@ class Archive(object):
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 for info in myzip.infolist():
-                    if (self._get_info_version(info) == number):
+                    if (self._split_path(info)[0] == number):
                         myzip.extract(info, dest)
+    
+    def list(self):
+        with rzip.TempUnrzip(self.archive_path) as zippath:
+            with ZipFile(zippath, 'r') as myzip:
+                retval = {}
+                for info in myzip.infolist():
+                    dt = datetime(*info.date_time)
+                    (version, path) = self._split_path(info)
+                    if not(retval.has_key(version)): retval[version] = []
+                    retval[version].append((path, dt))
+                return retval
