@@ -17,8 +17,7 @@ class TestArchive(TestCase):
         bar = os.path.join('tests', 'fixtures', 'bar')
         apath = mkstemppath()
         a = Archive(apath)
-        a.add_version(foo)
-        a.add_version(bar)
+        a.add_versions([foo, bar])
         with rzip.TempUnrzip(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 filenames = []
