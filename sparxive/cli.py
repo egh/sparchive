@@ -31,8 +31,9 @@ def main(rawargs=None):
           filer = Filer(path.abspath(args.root))
           for p in args.version_path:
                archive = filer.find_archive(p)
-               if archive.has_version(p):
-                    sys.stderr.write("That file is already archived.\n")
+               old_version = archive.has_version(p)
+               if old_version is not None:
+                    sys.stderr.write("That is already archived in version %d of %s.\n"%(old_version, archive.archive_path))
                     sys.exit(1)
                else:
                     archive.add_version(p)

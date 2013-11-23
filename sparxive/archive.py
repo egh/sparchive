@@ -90,15 +90,16 @@ class Archive(object):
         filename_crc_set = None
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
-                for version in Archive._zip_versions(myzip):
+                versions = Archive._zip_versions(myzip)
+                for (versionno, version) in enumerate(versions):
                     # first check the files without CRC
                     version_files = [ p[0] for p in version ]
                     if set(version_files) == filename_set:
                         if filename_crc_set is None:
                             filename_crc_set = set([ (f, Archive._crc32(f)) for f in filename_set ])
                         if set(version) == filename_crc_set:
-                            return True
-        return False
+                            return versionno
+        return None
 
     @staticmethod
     def _crc32(filename):

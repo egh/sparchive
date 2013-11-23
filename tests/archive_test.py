@@ -40,17 +40,17 @@ class TestArchive(TestCase):
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version(foo)
-        assert(a.has_version(foo))
-        assert(not(a.has_version(os.path.join('foobar', 'bar'))))
+        assert_equal(0, a.has_version(foo))
+        assert_equal(None, a.has_version(os.path.join('foobar', 'bar')))
 
     def test_has_version_dir(self):
         foo = os.path.join('foobar')
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version(foo)
-        assert(a.has_version(foo))
-        assert(not(a.has_version(os.path.join('foobar', 'bar'))))
-        assert(not(a.has_version(os.getcwd())))
+        assert_equal(0, a.has_version(foo))
+        assert_equal(None, a.has_version(os.path.join('foobar', 'bar')))
+        assert_equal(None, a.has_version(os.getcwd()))
 
     def test_add_file(self):
         foo = os.path.join('foobar', 'foo')
