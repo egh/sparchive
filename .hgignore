@@ -1,2 +1,5 @@
 venv
 pyc
+build
+sparxive.egg-info
+dist
