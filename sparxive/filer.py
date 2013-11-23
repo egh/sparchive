@@ -1,6 +1,7 @@
 import datetime
 import os
 import time
+from sparxive.archive import Archive
 
 class Filer(object):
     def __init__(self, basedir):
@@ -26,12 +27,14 @@ class Filer(object):
         times.reverse()
         return times[0]
 
-    def find_archive_path(self, pathname):
-        """Find a path to a new or old archive which should be used to archive this path."""
+    def find_archive(self, pathname):
+        """Find a new or old archive which should be used to archive this path."""
         archivename = "%s.zip.rz"%(os.path.basename(pathname))
         old_archive = self.find_file(archivename)
         if old_archive is not None:
             return old_archive
         else:
             t = self.get_mtime(pathname)
-            return os.path.join(self.basedir, "%04d"%(t.tm_year), "%02d"%(t.tm_mon), archivename)
+            return Archive(os.path.join(self.basedir, "%04d"%(t.tm_year), "%02d"%(t.tm_mon), archivename))
+            
+    
