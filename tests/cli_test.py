@@ -26,3 +26,4 @@ class CliTest(TestCase):
                 for info in myzip.infolist():
                     filenames.append(info.filename)
                 assert_equal(filenames, ["0/foobar/foo", "1/foobar/bar"])
+        sparxive.cli.main(["list", a])

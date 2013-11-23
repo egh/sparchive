@@ -18,7 +18,7 @@ def main(rawargs=None):
      elif args.COMMAND == "extract":
           pass
      elif args.COMMAND == "list":
-          d = Archive(args.archive[0]).list()
+          d = Archive(args.archive).list()
           for n in sorted(d.keys()):
                print "version %d:"%n
                for (p, dt) in d[n]:
