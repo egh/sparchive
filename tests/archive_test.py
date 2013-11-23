@@ -22,8 +22,7 @@ class TestArchive(TestCase):
                 assert_equal(filenames, [ info.filename for info in myzip.infolist() ])
 
     def test_crc32(self):
-        a = Archive('FAKE')
-        assert_equal('ffab723a', "%x"%(a._crc32(os.path.join('foobar', 'foo'))))
+        assert_equal('ffab723a', "%x"%(Archive._crc32(os.path.join('foobar', 'foo'))))
 
     def test_has_version(self):
         foo = os.path.join('foobar', 'foo')

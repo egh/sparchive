@@ -11,7 +11,8 @@ class Archive(object):
     def __init__(self, archive_path):
         self.archive_path = archive_path
 
-    def _split_path(self, info):
+    @staticmethod
+    def _split_path(info):
         """Splits a ZipInfo path into a versionnumber, path tuple."""
         md = re.match(r"^([0-9]+)/(.*)$", info.filename)
         if md is None:
@@ -25,7 +26,7 @@ class Archive(object):
             version_count = 0
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 for info in myzip.infolist():
-                    this_version = self._split_path(info)[0]
+                    this_version = Archive._split_path(info)[0]
                     if (this_version+1) > version_count:
                         version_count = (this_version+1)
             return version_count
@@ -61,18 +62,32 @@ class Archive(object):
         # perform sanity checks here
         os.rename(tmprzip, self.archive_path)
 
+    @staticmethod
+    def _zip_versions(myzip):
+        """Returns list of versions in the zip, where each version is a set
+        of filename, crc tuples [[("a", crca1)], [("a", crca2), ("b", crcb2)]]".
+        """
+        retval = []
+        for info in myzip.infolist():
+            (version, p) = Archive._split_path(info)
+            while len(retval) <= version:
+                retval.append([])
+            retval[version].append((p, info.CRC))
+        return retval
+
     def has_version(self, path):
         """Return true if the archive already has a version that matchs path."""
         crc = self._crc32(path)
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
                 for info in myzip.infolist():
-                    p = self._split_path(info)[1]
+                    p = Archive._split_path(info)[1]
                     if (info.CRC == crc) and (path == p):
                         return True
         return False
 
-    def _crc32(self, filename):
+    @staticmethod
+    def _crc32(filename):
         with open(filename, 'rb') as fd:
             buff = fd.read(16384)
             sofar = (binascii.crc32(buff) & 0xffffffff)
@@ -87,7 +102,7 @@ class Archive(object):
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 for info in myzip.infolist():
-                    if (self._split_path(info)[0] == number):
+                    if (Archive._split_path(info)[0] == number):
                         myzip.extract(info, dest)
     
     def list(self):
@@ -96,7 +111,7 @@ class Archive(object):
                 retval = {}
                 for info in myzip.infolist():
                     dt = datetime(*info.date_time)
-                    (version, path) = self._split_path(info)
+                    (version, path) = Archive._split_path(info)
                     if not(retval.has_key(version)): retval[version] = []
                     retval[version].append((path, dt))
                 return retval
