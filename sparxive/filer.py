@@ -34,4 +34,4 @@ class Filer(object):
             return old_archive
         else:
             t = self.get_mtime(pathname)
-            return os.path.join(self.basedir, "%d"(t.month), archivename)
+            return os.path.join(self.basedir, "%04d"%(t.tm_year), "%02d"%(t.tm_mon), archivename)
