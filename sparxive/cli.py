@@ -31,7 +31,11 @@ def main(rawargs=None):
           filer = Filer(path.abspath(args.root))
           for p in args.version_path:
                archive = filer.find_archive(p)
-               archive.add_version(p)
+               if archive.has_version(p):
+                    sys.stderr.write("That file is already archived.\n")
+                    sys.exit(1)
+               else:
+                    archive.add_version(p)
      elif args.command == "list":
           d = Archive(args.archive).list()
           for n in sorted(d.keys()):
