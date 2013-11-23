@@ -9,6 +9,11 @@ from zipfile import ZipFile
 import time
 
 class TestArchive(TestCase):
+    def assert_ziprz_filenames(self, path, filenames):
+        with rzip.TempUnrzip(path) as zippath:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
+                assert_equal(filenames, [ info.filename for info in myzip.infolist() ])
+        
     def test_get_mtime(self):
         assert_equal(time.ctime(1385061271), get_mtime(os.path.join('tests', 'fixtures')))
 
@@ -18,12 +23,7 @@ class TestArchive(TestCase):
         apath = mkstemppath()
         a = Archive(apath)
         a.add_versions([foo, bar])
-        with rzip.TempUnrzip(apath) as zippath:
-            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
-                filenames = []
-                for info in myzip.infolist():
-                    filenames.append(info.filename)
-                assert_equal(filenames, ["0/tests/fixtures/foo", "1/tests/fixtures/bar"])
+        self.assert_ziprz_filenames(apath, ["0/tests/fixtures/foo", "1/tests/fixtures/bar"])
 
     def test_add_100_versions(self):
         foo = os.path.join('tests', 'fixtures', 'foo')
@@ -31,13 +31,7 @@ class TestArchive(TestCase):
         a = Archive(apath)
         for n in range(0, 100):
             a.add_version(foo)
-        with rzip.TempUnrzip(apath) as zippath:
-            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
-                filenames = []
-                filenames_assert = [ "%d/tests/fixtures/foo"%(n) for n in range(0, 100) ]
-                for info in myzip.infolist():
-                    filenames.append(info.filename)
-                assert_equal(filenames_assert, filenames)
+        self.assert_ziprz_filenames(apath, [ "%d/tests/fixtures/foo"%(n) for n in range(0, 100) ])
 
     def test_extract_version(self):
         foo = os.path.join('tests', 'fixtures', 'foo')
