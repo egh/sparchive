@@ -20,7 +20,7 @@ class TestArchive(TestCase):
         a.add_version(foo)
         a.add_version(bar)
         with rzip.TempUnrzip(apath) as zippath:
-            with ZipFile(zippath, 'r') as myzip:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 filenames = []
                 for info in myzip.infolist():
                     filenames.append(info.filename)
@@ -33,7 +33,7 @@ class TestArchive(TestCase):
         for n in range(0, 100):
             a.add_version(foo)
         with rzip.TempUnrzip(apath) as zippath:
-            with ZipFile(zippath, 'r') as myzip:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 filenames = []
                 filenames_assert = [ "%d/tests/fixtures/foo"%(n) for n in range(0, 100) ]
                 for info in myzip.infolist():

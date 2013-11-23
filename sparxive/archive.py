@@ -36,7 +36,7 @@ class Archive(object):
             return 0
         else:
             version_count = 0
-            with ZipFile(zippath, 'r') as myzip:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 for info in myzip.infolist():
                     this_version = self._get_info_version(info)
                     if (this_version+1) > version_count:
@@ -49,7 +49,7 @@ class Archive(object):
             raise Exception()
         with rzip.TempUnrzip(self.archive_path) as zippath:
             new_version = self.get_version_count(zippath)
-            with ZipFile(zippath, 'a') as myzip:
+            with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
                 myzip.write(path, "%d/%s"%(new_version, path))
             tmprzip = mkstemppath()
             rzip.compress(zippath, tmprzip)
