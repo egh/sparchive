@@ -5,7 +5,7 @@ from sparxive.archive import Archive
 def main(rawargs=None):
      if rawargs is None: rawargs = sys.argv[1:]
      parser = argparse.ArgumentParser(description='sparkive - simple python archiver')
-     parser.add_argument('COMMAND', nargs=1, help='command to run', choices=['add', 'extact', 'list', 'search'])
+     parser.add_argument('COMMAND', nargs=1, help='command to run', choices=['add', 'extract', 'list', 'search'])
      parser.add_argument('archive', nargs=1, help='archive file')
      parser.add_argument('version_path', nargs=1, help='path to version to add')
      args = parser.parse_args(rawargs)
