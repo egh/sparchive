@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 import re
+import binascii
 from zipfile import ZipFile
 
 from sparxive import rzip
@@ -59,6 +60,27 @@ class Archive(object):
             rzip.compress(zippath, tmprzip)
         # perform sanity checks here
         os.rename(tmprzip, self.archive_path)
+
+    def has_version(self, path):
+        """Return true if the archive already has a version that matchs path."""
+        crc = self._crc32(path)
+        with rzip.TempUnrzip(self.archive_path) as zippath:
+            with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
+                for info in myzip.infolist():
+                    p = self._split_path(info)[1]
+                    if (info.CRC == crc) and (path == p):
+                        return True
+        return False
+
+    def _crc32(self, filename):
+        with open(filename, 'rb') as fd:
+            buff = fd.read(16384)
+            sofar = binascii.crc32(buff)
+            buff = fd.read(16384)
+            while (buff != ""):
+                zlib.crc32(buff, sofar)
+                buff = fd.read(16384)
+            return sofar & 0xffffffff
 
     def extract_version(self, number, dest):
         """Extract a version."""

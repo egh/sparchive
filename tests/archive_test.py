@@ -20,7 +20,19 @@ class TestArchive(TestCase):
         with rzip.TempUnrzip(path) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 assert_equal(filenames, [ info.filename for info in myzip.infolist() ])
-        
+
+    def test_crc32(self):
+        a = Archive('FAKE')
+        assert_equal('ffab723a', "%x"%(a._crc32(os.path.join('foobar', 'foo'))))
+
+    def test_has_version(self):
+        foo = os.path.join('foobar', 'foo')
+        apath = mkstemppath()
+        a = Archive(apath)
+        a.add_version(foo)
+        assert(a.has_version(foo))
+        assert(not(a.has_version(os.path.join('foobar', 'bar'))))
+
     def test_add_file(self):
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')
