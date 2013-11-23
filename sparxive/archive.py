@@ -3,6 +3,22 @@ from sparxive import mkstemppath
 import re
 import os
 from zipfile import ZipFile
+import time
+
+def get_mtime(path):
+    def handle(path, times):
+        if os.path.isdir(path):
+            for name in os.listdir(path):
+                handle(os.path.join(path, name), times)
+        elif os.path.isfile(path):
+            # check if boring
+            times.append(time.ctime(os.path.getmtime(path)))
+
+    times = []
+    handle(path, times)
+    times.sort()
+    times.reverse()
+    return times[0]
 
 class Archive(object):
     def __init__(self, archive_path):
