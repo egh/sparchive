@@ -50,8 +50,8 @@ class TestArchive(TestCase):
         xdir = mkdtemp()
         a.extract_version(0, xdir)
         assert(os.path.exists(os.path.join(xdir, '0', 'tests', 'fixtures', 'foo')))
-        assert_equal("hello, world", open(os.path.join(xdir, '0', 'tests', 'fixtures', 'foo')).read())
+        assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'tests', 'fixtures', 'foo')).read())
 
         a.extract_version(1, xdir)
         assert(os.path.exists(os.path.join(xdir, '1', 'tests', 'fixtures', 'bar')))
-        assert_equal("goodbye, world", open(os.path.join(xdir, '1', 'tests', 'fixtures', 'bar')).read())
+        assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'tests', 'fixtures', 'bar')).read())
