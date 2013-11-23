@@ -44,6 +44,8 @@ class Archive(object):
 
     def add_versions(self, pathlist):
         """Add multiple versions to this archive."""
+        if not(os.path.isdir(os.path.dirname(self.archive_path))):
+            os.makedirs(os.path.dirname(self.archive_path))
         for path in pathlist:
             if not(os.path.exists(path)):
                 raise Exception()
