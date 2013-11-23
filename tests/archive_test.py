@@ -43,6 +43,15 @@ class TestArchive(TestCase):
         assert(a.has_version(foo))
         assert(not(a.has_version(os.path.join('foobar', 'bar'))))
 
+    def test_has_version_dir(self):
+        foo = os.path.join('foobar')
+        apath = mkstemppath()
+        a = Archive(apath)
+        a.add_version(foo)
+        assert(a.has_version(foo))
+        assert(not(a.has_version(os.path.join('foobar', 'bar'))))
+        assert(not(a.has_version(os.getcwd())))
+
     def test_add_file(self):
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')

@@ -77,13 +77,27 @@ class Archive(object):
 
     def has_version(self, path):
         """Return true if the archive already has a version that matchs path."""
-        crc = self._crc32(path)
+        def mk_filename_set():
+            if os.path.isfile(path):
+                return set([path])
+            else:
+                filenames = []
+                for root, dirs, files in os.walk(path):
+                    filenames = filenames + [ os.path.join(root, filename) for filename in files ]
+                return set(filenames)
+
+        filename_set = mk_filename_set()
+        filename_crc_set = None
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
-                for info in myzip.infolist():
-                    p = Archive._split_path(info)[1]
-                    if (info.CRC == crc) and (path == p):
-                        return True
+                for version in Archive._zip_versions(myzip):
+                    # first check the files without CRC
+                    version_files = [ p[0] for p in version ]
+                    if set(version_files) == filename_set:
+                        if filename_crc_set is None:
+                            filename_crc_set = set([ (f, Archive._crc32(f)) for f in filename_set ])
+                        if set(version) == filename_crc_set:
+                            return True
         return False
 
     @staticmethod
