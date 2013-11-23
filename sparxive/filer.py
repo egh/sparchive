@@ -29,7 +29,7 @@ class Filer(object):
 
     def find_archive(self, pathname):
         """Find a new or old archive which should be used to archive this path."""
-        archivename = "%s.zip.rz"%(os.path.basename(pathname))
+        archivename = "%s.zip.rz"%(os.path.basename(os.path.normpath(pathname)))
         old_archive = self.find_file(archivename)
         if old_archive is not None:
             return Archive(old_archive)

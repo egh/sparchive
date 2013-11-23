@@ -20,3 +20,5 @@ class FilerTest(TestCase):
         filer = Filer('.')
         assert_equal(path.join('.', '2013','11','foobar.zip.rz'), filer.find_archive(path.join('tests', 'fixtures', 'foobar')).archive_path)
         assert_equal(path.join('.', '2013','11','foo.zip.rz'), filer.find_archive(path.join('tests', 'fixtures', 'foobar', 'foo')).archive_path)
+        # trailing slash check
+        assert_equal(path.join('.', '2013','11','foobar.zip.rz'), filer.find_archive(path.join('tests/fixtures/foobar/')).archive_path)
