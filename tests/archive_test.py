@@ -33,6 +33,13 @@ class TestArchive(TestCase):
             a.add_version(foo)
         self.assert_ziprz_filenames(apath, [ "%d/tests/fixtures/foo"%(n) for n in range(0, 100) ])
 
+    def test_add_dir(self):
+        foo = os.path.join('tests', 'fixtures')
+        apath = mkstemppath()
+        a = Archive(apath)
+        a.add_version(foo)
+        self.assert_ziprz_filenames(apath, ["0/tests/fixtures/bar", "0/tests/fixtures/foo"])
+
     def test_extract_version(self):
         foo = os.path.join('tests', 'fixtures', 'foo')
         bar = os.path.join('tests', 'fixtures', 'bar')

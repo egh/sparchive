@@ -47,6 +47,15 @@ class Archive(object):
         """Add a new version to this archive."""
         self.add_versions([path])
 
+    def _add_path(self, path, version, myzip):
+        if (os.path.isdir(path)):
+            for name in os.listdir(path):
+                self._add_path(os.path.join(path, name), version, myzip)
+        elif (os.path.isfile(path)):
+            myzip.write(path, "%d/%s"%(version, path))
+        else:
+            raise Exception()
+
     def add_versions(self, pathlist):
         """Add multiple versions to this archive."""
         for path in pathlist:
@@ -54,10 +63,10 @@ class Archive(object):
                 raise Exception()
         with rzip.TempUnrzip(self.archive_path) as zippath:
             new_version = self.get_version_count(zippath)
-            for path in pathlist:
-                with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
-                    myzip.write(path, "%d/%s"%(new_version, path))
-                new_version = new_version + 1
+            with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
+                for path in pathlist:
+                    self._add_path(path, new_version, myzip)
+                    new_version = new_version + 1
             tmprzip = mkstemppath()
             rzip.compress(zippath, tmprzip)
         # perform sanity checks here
