@@ -32,7 +32,7 @@ class Filer(object):
         archivename = "%s.zip.rz"%(os.path.basename(pathname))
         old_archive = self.find_file(archivename)
         if old_archive is not None:
-            return old_archive
+            return Archive(old_archive)
         else:
             t = self.get_mtime(pathname)
             return Archive(os.path.join(self.basedir, "%04d"%(t.tm_year), "%02d"%(t.tm_mon), archivename))
