@@ -75,12 +75,12 @@ class Archive(object):
     def _crc32(self, filename):
         with open(filename, 'rb') as fd:
             buff = fd.read(16384)
-            sofar = binascii.crc32(buff)
+            sofar = (binascii.crc32(buff) & 0xffffffff)
             buff = fd.read(16384)
             while (buff != ""):
-                zlib.crc32(buff, sofar)
+                sofar = (binascii.crc32(buff, sofar) & 0xffffffff)
                 buff = fd.read(16384)
-            return sofar & 0xffffffff
+            return sofar 
 
     def extract_version(self, number, dest):
         """Extract a version."""
