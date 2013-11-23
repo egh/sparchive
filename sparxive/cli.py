@@ -5,11 +5,11 @@ from sparxive.archive import Archive
 def main(rawargs=None):
      if rawargs is None: rawargs = sys.argv[1:]
      parser = argparse.ArgumentParser(description='sparkive - simple python archiver')
-     parser.add_argument('COMMAND', help='command to run', choices=['add', 'extract', 'list', 'search'])
+     parser.add_argument('COMMAND', help='command to run', choices=['addversion', 'archive', 'extract', 'list', 'search'])
      parser.add_argument('archive', help='archive file')
      parser.add_argument('version_path', nargs="?", help='path to version to add', default=None)
      args = parser.parse_args(rawargs)
-     if (args.COMMAND == "add"):
+     if args.COMMAND == "addversion":
           if (args.version_path is None):
                sys.stderr("You must provide a path to a version to add!")
           else:

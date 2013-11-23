@@ -17,8 +17,8 @@ class CliTest(TestCase):
         a = mkstemppath()
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')
-        sparxive.cli.main(["add", a, foo])
-        sparxive.cli.main(["add", a, bar])
+        sparxive.cli.main(["addversion", a, foo])
+        sparxive.cli.main(["addversion", a, bar])
         assert(os.path.exists(a))
         with rzip.TempUnrzip(a) as zippath:
             with ZipFile(zippath, 'r') as myzip:
