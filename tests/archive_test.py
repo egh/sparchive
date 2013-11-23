@@ -38,6 +38,10 @@ class TestArchive(TestCase):
         a = Archive(apath)
         a.add_version(i)
         self.assert_ziprz_filenames(apath, ["0/“Iñtërnâtiônàlizætiøn”"])
+        xdir = mkdtemp()
+        a.extract_version(0, xdir)
+        assert(os.path.exists(os.path.join(xdir, '0', "“Iñtërnâtiônàlizætiøn”")))
+        assert_equal(open(i).read(), open(os.path.join(xdir, '0', '“Iñtërnâtiônàlizætiøn”')).read())
 
     def test_add_100_versions(self):
         foo = os.path.join('foobar', 'foo')
