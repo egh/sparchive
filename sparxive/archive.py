@@ -29,6 +29,8 @@ class Archive(object):
 
     def add_version(self, path):
         """Add a new version to this archive."""
+        if not(os.path.exists(path)):
+            raise Exception()
         with rzip.TempUnrzip(self.archive_path) as zippath:
             new_version = self.get_version_count(zippath)
             with ZipFile(zippath, 'a') as myzip:
