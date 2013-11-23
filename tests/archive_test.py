@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from sparxive import rzip
-from sparxive.archive import Archive, get_mtime
+from sparxive.archive import Archive
 from unittest import TestCase
 from nose.tools import assert_equal
 from sparxive import mkstemppath
@@ -21,9 +21,6 @@ class TestArchive(TestCase):
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 assert_equal(filenames, [ info.filename for info in myzip.infolist() ])
         
-    def test_get_mtime(self):
-        assert_equal(time.gmtime(1385192191), get_mtime('foobar'))
-
     def test_add_file(self):
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')
