@@ -7,7 +7,7 @@ from sparxive import mkstemppath
 
 class TestRzip(TestCase):
     def test_compress_file(self):
-        p = os.path.join('tests', 'fixtures', 'foo')
+        p = os.path.join('tests', 'fixtures', 'foobar', 'foo')
         prz = mkstemppath()
         assert(os.path.exists(p))
         assert(not(os.path.exists(prz)))
@@ -17,7 +17,7 @@ class TestRzip(TestCase):
         os.unlink(prz)
 
     def test_uncompress_file(self):
-        p = os.path.join('tests', 'fixtures', 'foo')
+        p = os.path.join('tests', 'fixtures', 'foobar', 'foo')
         prz = mkstemppath()
         pr2 = mkstemppath()
         rzip.compress(p, prz)
