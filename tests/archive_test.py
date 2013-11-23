@@ -26,6 +26,20 @@ class TestArchive(TestCase):
                     filenames.append(info.filename)
                 assert_equal(filenames, ["0/tests/fixtures/foo", "1/tests/fixtures/bar"])
 
+    def test_add_100_versions(self):
+        foo = os.path.join('tests', 'fixtures', 'foo')
+        apath = mkstemppath()
+        a = Archive(apath)
+        for n in range(0, 100):
+            a.add_version(foo)
+        with rzip.TempUnrzip(apath) as zippath:
+            with ZipFile(zippath, 'r') as myzip:
+                filenames = []
+                filenames_assert = [ "%d/tests/fixtures/foo"%(n) for n in range(0, 100) ]
+                for info in myzip.infolist():
+                    filenames.append(info.filename)
+                assert_equal(filenames_assert, filenames)
+
     def test_extract_version(self):
         foo = os.path.join('tests', 'fixtures', 'foo')
         bar = os.path.join('tests', 'fixtures', 'bar')
