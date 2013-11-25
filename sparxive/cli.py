@@ -23,6 +23,12 @@ def main(rawargs=None):
      ls.add_argument('archive', help='archive file')
      ls.set_defaults(command='list')
 
+     extract = subparsers.add_parser("list")
+     extract.add_argument('archive', help='archive file to extract from')
+     extract.add_argument('version', nargs="?", help='version number to extract')
+     extract.add_argument('path', nargs="*", help='path to extract')
+     extract.set_defaults(command='extract')
+
      args = parser.parse_args(rawargs)
      if args.command == "addversion":
           a = Archive(args.archive)

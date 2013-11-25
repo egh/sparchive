@@ -33,5 +33,5 @@ class CliTest(TestCase):
     def test_cli_archive(self):
         archive = mkdtemp()
         foo = path.join('foobar', 'foo')
-        sparxive.cli.main(['archive', '-r', archive, foo])
+        sparxive.cli.main(['file', '-r', archive, foo])
         assert(path.exists(path.join(archive, '2013', '11', 'foo.zip.rz')))
