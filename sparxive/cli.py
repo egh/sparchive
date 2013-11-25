@@ -23,9 +23,9 @@ def main(rawargs=None):
      ls.add_argument('archive', help='archive file')
      ls.set_defaults(command='list')
 
-     extract = subparsers.add_parser("list")
+     extract = subparsers.add_parser("extract")
      extract.add_argument('archive', help='archive file to extract from')
-     extract.add_argument('version', nargs="?", help='version number to extract')
+     extract.add_argument('version', nargs="?", help='version number to extract', default=None)
      extract.add_argument('path', nargs="*", help='path to extract')
      extract.set_defaults(command='extract')
 
@@ -49,6 +49,9 @@ def main(rawargs=None):
                print "version %d:"%n
                for (p, dt) in d[n]:
                     print "  %s  (%s)"%(p, dt.strftime("%Y-%m-%d %H:%M:%S"))
+     elif args.command == "extract":
+          a = Archive(args.archive)
+          a.extract(".", args.version)
 
 if __name__ == "__main__":
     main()
