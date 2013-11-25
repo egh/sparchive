@@ -36,6 +36,7 @@ def main(rawargs=None):
                     sys.stderr.write("%s is already archived in version %d of %s.\n"%(p, old_version, archive.archive_path))
                else:
                     archive.add_version(p)
+                    sys.stderr.write("%s archived in %s.\n"%(p, archive.archive_path))
      elif args.command == "list":
           d = Archive(args.archive).list()
           for n in sorted(d.keys()):
