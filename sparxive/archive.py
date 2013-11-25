@@ -115,12 +115,14 @@ class Archive(object):
                 buff = fd.read(16384)
             return sofar 
 
-    def extract_version(self, number, dest):
+    def extract(self, dest, number=None):
         """Extract a version."""
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 for info in myzip.infolist():
-                    if (Archive._split_path(info)[0] == number):
+                    if number is None:
+                        myzip.extract(info, dest)
+                    elif (Archive._split_path(info)[0] == number):
                         myzip.extract(info, dest)
     
     def list(self):

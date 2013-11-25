@@ -8,6 +8,7 @@ from sparxive import mkstemppath
 from tempfile import mkdtemp
 from zipfile import ZipFile
 import time
+import shutil
 
 class TestArchive(TestCase):
     def setUp(self):
@@ -67,7 +68,7 @@ class TestArchive(TestCase):
         a.add_version(i)
         self.assert_ziprz_filenames(apath, ["0/“Iñtërnâtiônàlizætiøn”"])
         xdir = mkdtemp()
-        a.extract_version(0, xdir)
+        a.extract(xdir, 0)
         assert(os.path.exists(os.path.join(xdir, '0', "“Iñtërnâtiônàlizætiøn”")))
         assert_equal(open(i).read(), open(os.path.join(xdir, '0', '“Iñtërnâtiônàlizætiøn”')).read())
 
@@ -86,7 +87,7 @@ class TestArchive(TestCase):
         a.add_version(dir)
         self.assert_ziprz_filenames(apath, ["0/foobar/bar", "0/foobar/foo"])
 
-    def test_extract_version(self):
+    def test_extract(self):
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')
         apath = mkstemppath()
@@ -94,10 +95,20 @@ class TestArchive(TestCase):
         a.add_version(foo)
         a.add_version(bar)
         xdir = mkdtemp()
-        a.extract_version(0, xdir)
+        a.extract(xdir, 0)
         assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
         assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'foobar', 'foo')).read())
-
-        a.extract_version(1, xdir)
+        
+        a.extract(xdir, 1)
         assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
+        shutil.rmtree(xdir)
+
+        # now extract all versions
+        xdir = mkdtemp()
+        a.extract(xdir)
+        assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
+        assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'foobar', 'foo')).read())
+        assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
+        assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
+        shutil.rmtree(xdir)
