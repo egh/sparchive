@@ -9,10 +9,10 @@ def main(rawargs=None):
      parser = argparse.ArgumentParser(description='sparkive - simple python archiver')
      subparsers = parser.add_subparsers()
 
-     archive = subparsers.add_parser('archive')
-     archive.add_argument('-r', '--root', help='root of archive', default='/tmp')
-     archive.add_argument('version_path', nargs="+", help='paths to version to add', default=None)
-     archive.set_defaults(command='archive')
+     filer = subparsers.add_parser('file')
+     filer.add_argument('-r', '--root', help='root of archive', default='/home/egh/a.new/')
+     filer.add_argument('version_path', nargs="+", help='paths to version to add', default=None)
+     filer.set_defaults(command='file')
 
      addversion = subparsers.add_parser("addversion")
      addversion.add_argument('archive', help='archive file')
@@ -27,7 +27,7 @@ def main(rawargs=None):
      if args.command == "addversion":
           a = Archive(args.archive)
           a.add_version(args.version_path)
-     elif args.command == "archive":
+     elif args.command == "file":
           filer = Filer(path.abspath(args.root))
           for p in args.version_path:
                archive = filer.find_archive(p)
