@@ -33,8 +33,7 @@ def main(rawargs=None):
                archive = filer.find_archive(p)
                old_version = archive.has_version(p)
                if old_version is not None:
-                    sys.stderr.write("That is already archived in version %d of %s.\n"%(old_version, archive.archive_path))
-                    sys.exit(1)
+                    sys.stderr.write("%s is already archived in version %d of %s.\n"%(p, old_version, archive.archive_path))
                else:
                     archive.add_version(p)
      elif args.command == "list":
