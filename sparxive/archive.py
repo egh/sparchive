@@ -89,7 +89,7 @@ class Archive(object):
         filename_set = mk_filename_set()
         filename_crc_set = None
         with rzip.TempUnrzip(self.archive_path) as zippath:
-            with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 versions = Archive._zip_versions(myzip)
                 for (versionno, version) in enumerate(versions):
                     # first check the files without CRC
