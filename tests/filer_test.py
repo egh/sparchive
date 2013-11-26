@@ -5,6 +5,7 @@ from unittest import TestCase
 from nose.tools import assert_equal
 import os
 from os import path
+from tempfile import mkdtemp
 
 class FilerTest(TestCase):
     def test_find_file(self):
@@ -22,3 +23,14 @@ class FilerTest(TestCase):
         assert_equal(path.join('.', '2013','11','foo.zip.rz'), filer.find_archive(path.join('tests', 'fixtures', 'foobar', 'foo')).archive_path)
         # trailing slash check
         assert_equal(path.join('.', '2013','11','foobar.zip.rz'), filer.find_archive(path.join('tests/fixtures/foobar/')).archive_path)
+
+    def test_file(self):
+        olddir = os.getcwd()
+        rootdir = mkdtemp()
+        filer = Filer(rootdir)
+        os.chdir(path.join('tests', 'fixtures'))
+        results = filer.file('foobar')
+        assert_equal(results[0], True)
+        assert_equal(results[1], 0)
+        assert(os.path.exists(os.path.join(rootdir, '2013', '11', 'foobar.zip.rz')))
+        os.chdir(olddir)

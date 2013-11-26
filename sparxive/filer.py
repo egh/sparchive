@@ -37,4 +37,11 @@ class Filer(object):
             t = self.get_mtime(pathname)
             return Archive(os.path.join(self.basedir, "%04d"%(t.tm_year), "%02d"%(t.tm_mon), archivename))
             
-    
+    def file(self, path):
+        archive = self.find_archive(path)
+        old_version = archive.has_version(path)
+        if old_version is not None:
+            return (False, old_version, archive)
+        else:
+            archive.add_version(path)
+            return (True, 0, archive)

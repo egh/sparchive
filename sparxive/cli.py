@@ -36,13 +36,11 @@ def main(rawargs=None):
      elif args.command == "file":
           filer = Filer(path.abspath(args.root))
           for p in args.version_path:
-               archive = filer.find_archive(p)
-               old_version = archive.has_version(p)
-               if old_version is not None:
-                    sys.stderr.write("%s is already archived in version %d of %s.\n"%(p, old_version, archive.archive_path))
+               result = filer.file(p)
+               if result[0]:
+                    sys.stderr.write("%s archived in %s.\n"%(p, result[2].archive_path))
                else:
-                    archive.add_version(p)
-                    sys.stderr.write("%s archived in %s.\n"%(p, archive.archive_path))
+                    sys.stderr.write("%s is already archived in version %d of %s.\n"%(p, result[1], result[2].archive_path))
      elif args.command == "list":
           d = Archive(args.archive).list()
           for n in sorted(d.keys()):
