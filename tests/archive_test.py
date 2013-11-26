@@ -17,7 +17,8 @@ class TestArchive(TestCase):
     def tearDown(self):
         os.chdir(os.path.join('..', '..'))
 
-    def assert_ziprz_filenames(self, path, filenames):
+    @staticmethod
+    def assert_ziprz_filenames(path, filenames):
         with rzip.TempUnrzip(path) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 assert_equal(filenames, [ info.filename for info in myzip.infolist() ])
@@ -61,14 +62,14 @@ class TestArchive(TestCase):
         a = Archive(apath)
         a.add_version([foo])
         a.add_version([bar])
-        self.assert_ziprz_filenames(apath, ["0/foobar/foo", "1/foobar/bar"])
+        TestArchive.assert_ziprz_filenames(apath, ["0/foobar/foo", "1/foobar/bar"])
 
     def test_add_unicode_file(self):
         i = "“Iñtërnâtiônàlizætiøn”"
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([i])
-        self.assert_ziprz_filenames(apath, ["0/“Iñtërnâtiônàlizætiøn”"])
+        TestArchive.assert_ziprz_filenames(apath, ["0/“Iñtërnâtiônàlizætiøn”"])
         xdir = mkdtemp()
         a.extract(xdir, 0)
         assert(os.path.exists(os.path.join(xdir, '0', "“Iñtërnâtiônàlizætiøn”")))
@@ -80,14 +81,14 @@ class TestArchive(TestCase):
         a = Archive(apath)
         for n in range(0, 100):
             a.add_version([foo])
-        self.assert_ziprz_filenames(apath, [ "%d/foobar/foo"%(n) for n in range(0, 100) ])
+        TestArchive.assert_ziprz_filenames(apath, [ "%d/foobar/foo"%(n) for n in range(0, 100) ])
 
     def test_add_dir(self):
         dir = 'foobar'
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([dir])
-        self.assert_ziprz_filenames(apath, ["0/foobar/bar", "0/foobar/foo"])
+        TestArchive.assert_ziprz_filenames(apath, ["0/foobar/bar", "0/foobar/foo"])
 
     def test_extract(self):
         foo = os.path.join('foobar', 'foo')
