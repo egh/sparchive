@@ -37,7 +37,7 @@ class CliTest(TestCase):
                 assert_equal(filenames, ["0/foobar/foo", "1/foobar/bar"])
         sparxive.cli.main(["list", a])
         
-    def test_cli_archive(self):
+    def test_cli_file(self):
         archive = mkdtemp()
         foo = path.join('foobar', 'foo')
         sparxive.cli.main(['file', '-r', archive, foo])
