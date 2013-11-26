@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-from sparxive import rzip
-from sparxive.archive import Archive
+from sparchive import rzip
+from sparchive.archive import Archive
 from unittest import TestCase
 from nose.tools import assert_equal
-from sparxive import mkstemppath
+from sparchive import mkstemppath
 from tempfile import mkdtemp
 from zipfile import ZipFile
 import time

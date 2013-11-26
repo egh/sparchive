@@ -1,7 +1,7 @@
 import datetime
 import os
 import time
-from sparxive.archive import Archive
+from sparchive.archive import Archive
 
 class Filer(object):
     def __init__(self, basedir):

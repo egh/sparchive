@@ -4,8 +4,8 @@ import re
 import binascii
 from zipfile import ZipFile
 
-from sparxive import rzip
-from sparxive import mkstemppath
+from sparchive import rzip
+from sparchive import mkstemppath
 
 class Archive(object):
     def __init__(self, archive_path):

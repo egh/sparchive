@@ -1,6 +1,6 @@
 import datetime
 import time
-from sparxive.filer import Filer
+from sparchive.filer import Filer
 from unittest import TestCase
 from nose.tools import assert_equal
 import os

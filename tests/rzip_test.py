@@ -1,9 +1,9 @@
 import os
-from sparxive import rzip
+from sparchive import rzip
 from unittest import TestCase
 from nose.tools import assert_equal
 import hashlib
-from sparxive import mkstemppath
+from sparchive import mkstemppath
 
 class TestRzip(TestCase):
     def test_compress_file(self):

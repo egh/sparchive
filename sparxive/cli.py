@@ -1,7 +1,7 @@
 import argparse
 import sys
-from sparxive.archive import Archive
-from sparxive.filer import Filer
+from sparchive.archive import Archive
+from sparchive.filer import Filer
 from os import path
 
 def main(rawargs=None):

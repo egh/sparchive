@@ -1,5 +1,5 @@
 import subprocess
-from sparxive import mkstemppath
+from sparchive import mkstemppath
 import os
 
 def compress(uncompressed, compressed, level=6):
