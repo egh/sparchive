@@ -30,7 +30,8 @@ class TestArchive(TestCase):
         bar = os.path.join('foobar', 'bar')
         apath = mkstemppath()
         a = Archive(apath)
-        a.add_versions([foo, bar])
+        a.add_version(foo)
+        a.add_version(bar)
         with rzip.TempUnrzip(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 assert_equal([[('foobar/foo', 4289425978)], [('foobar/bar', 1226766874)]],
@@ -58,7 +59,8 @@ class TestArchive(TestCase):
         bar = os.path.join('foobar', 'bar')
         apath = mkstemppath()
         a = Archive(apath)
-        a.add_versions([foo, bar])
+        a.add_version(foo)
+        a.add_version(bar)
         self.assert_ziprz_filenames(apath, ["0/foobar/foo", "1/foobar/bar"])
 
     def test_add_unicode_file(self):
