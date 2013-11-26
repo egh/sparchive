@@ -1,4 +1,3 @@
-from datetime import datetime
 import os
 import re
 import binascii
@@ -125,8 +124,7 @@ class Archive(object):
             with ZipFile(zippath, 'r') as myzip:
                 retval = {}
                 for info in myzip.infolist():
-                    dt = datetime(*info.date_time)
                     (version, path) = Archive._split_path(info)
                     if not(retval.has_key(version)): retval[version] = []
-                    retval[version].append((path, dt))
+                    retval[version].append((path, info))
                 return retval
