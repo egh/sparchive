@@ -16,7 +16,7 @@ def main(rawargs=None):
 
      addversion = subparsers.add_parser("addversion")
      addversion.add_argument('archive', help='archive file')
-     addversion.add_argument('version_path', help='path to version to add', default=None)
+     addversion.add_argument('version_path', nargs="+", help='path to version to add', default=None)
      addversion.set_defaults(command='addversion')
 
      ls = subparsers.add_parser("list")

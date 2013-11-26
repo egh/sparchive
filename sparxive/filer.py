@@ -43,5 +43,5 @@ class Filer(object):
         if old_version is not None:
             return (False, old_version, archive)
         else:
-            archive.add_version(path)
+            archive.add_version([path])
             return (True, 0, archive)

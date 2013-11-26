@@ -10,10 +10,17 @@ from tempfile import mkdtemp
 
 class CliTest(TestCase):
     def setUp(self):
+        self.olddir = os.getcwd()
         os.chdir(os.path.join('tests', 'fixtures'))
 
     def tearDown(self):
-        os.chdir(os.path.join('..', '..'))
+        os.chdir(self.olddir)
+
+    @staticmethod
+    def assert_ziprz_filenames(path, filenames):
+        with rzip.TempUnrzip(path) as zippath:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
+                assert_equal(filenames, [ info.filename for info in myzip.infolist() ])
 
     def test_cli(self):
         a = mkstemppath()
@@ -35,6 +42,12 @@ class CliTest(TestCase):
         foo = path.join('foobar', 'foo')
         sparxive.cli.main(['file', '-r', archive, foo])
         assert(path.exists(path.join(archive, '2013', '11', 'foo.zip.rz')))
+
+    def test_cli_addversion(self):
+        a = mkstemppath()
+        os.chdir('foobar')
+        sparxive.cli.main(['addversion', a, 'foo', 'bar'])
+        CliTest.assert_ziprz_filenames(a, ['0/foo', '0/bar'])
 
     def test_cli_exxtract(self):
         a = mkstemppath()
