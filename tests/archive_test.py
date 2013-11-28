@@ -125,5 +125,5 @@ class TestArchive(TestCase):
         assert_equal(datetime(2001, 1, 1, 0, 0), Archive.get_mtime_as_utcdatetime(apath))
         os.unlink(apath)
 
-    def test_unixtime_to_ziptime(self):
-        assert_equal(Archive.unixtime_to_ziptime(978307200), (2001, 1, 1, 0, 0, 0))
+    def test_unixtime_to_utcziptime(self):
+        assert_equal(Archive.unixtime_to_utcziptime(978307200), (2001, 1, 1, 0, 0, 0))

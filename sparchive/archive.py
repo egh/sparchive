@@ -17,7 +17,7 @@ class Archive(object):
         return datetime.utcfromtimestamp(os.path.getmtime(path))
 
     @staticmethod
-    def unixtime_to_ziptime(utime):
+    def unixtime_to_utcziptime(utime):
         epoch = 315532800 # calendar.timegm((1980, 1, 1, 0, 0, 0, 1, 1, 0))
         if utime < epoch: utime = epoch
         return time.gmtime(utime)[:6]
