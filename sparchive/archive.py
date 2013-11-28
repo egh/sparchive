@@ -150,10 +150,10 @@ class Archive(object):
                         myzip.extract(info, dest)
                         extra = Archive.parse_extra(info.extra)
                         if extra.has_key(0x5455):
-                            flags, mtime = struct.unpack("<Bl", extra[0x5455])
-                            if flags == 1:
-                                name = os.path.join(dest, info.filename)
-                                os.utime(name, (mtime, mtime))
+                            # parse extended datetime
+                            flags, mtime = struct.unpack("<Bl", extra[0x5455][:5])
+                            name = os.path.join(dest, info.filename)
+                            os.utime(name, (mtime, mtime))
                         os.chmod(os.path.join(dest, info.filename), info.external_attr >> 16L & 0000777)
     
     def list(self):
