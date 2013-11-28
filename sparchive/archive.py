@@ -150,7 +150,7 @@ class Archive(object):
                         extra = Archive.parse_extra(info.extra)
                         if extra.has_key(0x5455):
                             # parse extended datetime
-                            flags, mtime = struct.unpack("<Bl", extra[0x5455][:5])
+                            flags, mtime = struct.unpack("<Bl", extra[0x5455])
                             name = os.path.join(dest, info.filename)
                             os.utime(name, (mtime, mtime))
                         os.chmod(os.path.join(dest, info.filename), info.external_attr >> 16L & 0000777)
