@@ -1,3 +1,4 @@
+import struct
 from datetime import datetime
 import os
 import re
@@ -21,7 +22,7 @@ class Archive(object):
         epoch = 315532800 # calendar.timegm((1980, 1, 1, 0, 0, 0, 1, 1, 0))
         if utime < epoch: utime = epoch
         return time.gmtime(utime)[:6]
-        
+
     @staticmethod
     def _split_path(info):
         """Splits a ZipInfo path into a versionnumber, path tuple."""
@@ -47,8 +48,14 @@ class Archive(object):
             for name in os.listdir(path):
                 self._add_path(os.path.join(path, name), version, myzip)
         elif (os.path.isfile(path)):
-            info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(os.path.getmtime(path)))
+            mtime = os.path.getmtime(path)
+            info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
             myzip.writestr(info, open(path).read())
+            info.extra += struct.pack('<hhBl',
+                                      0x5455, # block type: "extended-timestamp"
+                                      1 + 4,  # size of this block
+                                      1,      # "modification time is present"
+                                      mtime)  # time of last modification (UTC)
         else:
             raise Exception()
 

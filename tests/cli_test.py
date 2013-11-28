@@ -41,7 +41,7 @@ class CliTest(TestCase):
         archive = mkdtemp()
         foo = path.join('foobar', 'foo')
         sparchive.cli.main(['file', '-r', archive, foo])
-        assert(path.exists(path.join(archive, '2013', '11', 'foo.zip.rz')))
+        assert(path.exists(path.join(archive, '2001', '01', 'foo.zip.rz')))
 
     def test_cli_addversion(self):
         a = mkstemppath()
@@ -49,7 +49,7 @@ class CliTest(TestCase):
         sparchive.cli.main(['addversion', a, 'foo', 'bar'])
         CliTest.assert_ziprz_filenames(a, ['0/foo', '0/bar'])
 
-    def test_cli_exxtract(self):
+    def test_cli_extract(self):
         a = mkstemppath()
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')

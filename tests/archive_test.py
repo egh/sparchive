@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import struct
 from datetime import datetime
 import os
 from sparchive import rzip
@@ -127,3 +128,16 @@ class TestArchive(TestCase):
 
     def test_unixtime_to_utcziptime(self):
         assert_equal(Archive.unixtime_to_utcziptime(978307200), (2001, 1, 1, 0, 0, 0))
+
+    def test_timestamps(self):
+        foo = os.path.join('foobar', 'foo')
+        os.utime(foo, (978307200,  978307200))
+        
+        apath = mkstemppath()
+        a = Archive(apath)
+        a.add_version([foo])
+        with rzip.TempUnrzip(apath) as zippath:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
+                info = myzip.infolist()[0]
+                assert_equal(info.date_time, (2001, 1, 1, 0, 0, 0))
+                assert_equal(info.extra, struct.pack('<hhBl', 0x5455, 5, 1, 978307200))
