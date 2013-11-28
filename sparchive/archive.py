@@ -43,18 +43,27 @@ class Archive(object):
                         version_count = (this_version+1)
             return version_count
 
+    ZIP_EXT_ATTR_FILE = 0100000
+    ZIP_EXT_ATTR_DIR  = 0400000
+    
     def _add_path(self, path, version, myzip):
         mtime = os.path.getmtime(path)
         info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
         info.create_system = 3
         info.extra += struct.pack('<HHBl', 0x5455, 5, 1, mtime)
-        # works on linux.
         # http://unix.stackexchange.com/questions/14705/the-zip-formats-external-file-attribute
-        info.external_attr = os.stat(path).st_mode << 16L
+        # make mode without file type, which may be system-specific
+        clean_mode = os.stat(path).st_mode & 0000777
         if (os.path.isdir(path)):
+            # set zip file type to dir 
+            info.external_attr = (Archive.ZIP_EXT_ATTR_DIR | clean_mode) << 16L
+            # dos directory flag
+            info.external_attr |= 0x10
+#            myzip.writestr(info, '')
             for name in os.listdir(path):
                 self._add_path(os.path.join(path, name), version, myzip)
         elif (os.path.isfile(path)):
+            info.external_attr = (Archive.ZIP_EXT_ATTR_FILE | clean_mode) << 16L
             myzip.writestr(info, open(path).read())
         else:
             raise Exception()
