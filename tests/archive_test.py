@@ -97,6 +97,8 @@ class TestArchive(TestCase):
         bar = os.path.join('foobar', 'bar')
         os.utime(foo, (978307200,  978307200))
         os.utime(bar, (978307200,  978307200))
+        os.chmod(foo, 0644)
+        os.chmod(bar, 0755)
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([foo])
@@ -105,7 +107,7 @@ class TestArchive(TestCase):
         a.extract(xdir, 0)
         assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
         assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'foobar', 'foo')).read())
-        
+
         a.extract(xdir, 1)
         assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
@@ -117,9 +119,13 @@ class TestArchive(TestCase):
         assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
         assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'foobar', 'foo')).read())
         assert_equal(978307200.0, os.path.getmtime(os.path.join(xdir, '0', 'foobar', 'foo')))
+        assert_equal(0644, os.stat(os.path.join(xdir, '0', 'foobar', 'foo')).st_mode & 0000777)
+
         assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(978307200.0, os.path.getmtime(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
+        print oct(os.stat(os.path.join(xdir, '1', 'foobar', 'bar')).st_mode)
+        assert_equal(0755, os.stat(os.path.join(xdir, '1', 'foobar', 'bar')).st_mode & 0000777)
         shutil.rmtree(xdir)
 
     def test_get_utc_mtime(self):
@@ -152,3 +158,14 @@ class TestArchive(TestCase):
                 extra = Archive.parse_extra(info.extra)
                 assert_true(extra.has_key(0x5455))
                 assert_equal(extra[0x5455], struct.pack('<Bl', 1, 978307200))
+
+    def test_external_attr(self):
+        foo = os.path.join('foobar', 'foo')
+        os.chmod(foo, 0644)
+        apath = mkstemppath()
+        a = Archive(apath)
+        a.add_version([foo])
+        with rzip.TempUnrzip(apath) as zippath:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
+                info = myzip.infolist()[0]
+                assert_equal(info.external_attr, 0100644 << 16L)

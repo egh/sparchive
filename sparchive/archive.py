@@ -44,13 +44,17 @@ class Archive(object):
             return version_count
 
     def _add_path(self, path, version, myzip):
+        mtime = os.path.getmtime(path)
+        info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
+        info.create_system = 3
+        info.extra += struct.pack('<HHBl', 0x5455, 5, 1, mtime)
+        # works on linux.
+        # http://unix.stackexchange.com/questions/14705/the-zip-formats-external-file-attribute
+        info.external_attr = os.stat(path).st_mode << 16L
         if (os.path.isdir(path)):
             for name in os.listdir(path):
                 self._add_path(os.path.join(path, name), version, myzip)
         elif (os.path.isfile(path)):
-            mtime = os.path.getmtime(path)
-            info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
-            info.extra += struct.pack('<HHBl', 0x5455, 5, 1, mtime)
             myzip.writestr(info, open(path).read())
         else:
             raise Exception()
@@ -150,6 +154,7 @@ class Archive(object):
                             if flags == 1:
                                 name = os.path.join(dest, info.filename)
                                 os.utime(name, (mtime, mtime))
+                        os.chmod(os.path.join(dest, info.filename), info.external_attr >> 16L & 0000777)
     
     def list(self):
         with rzip.TempUnrzip(self.archive_path) as zippath:
