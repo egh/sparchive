@@ -90,7 +90,7 @@ class TestArchive(TestCase):
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([dir])
-        TestArchive.assert_ziprz_filenames(apath, ["0/foobar/bar", "0/foobar/foo"])
+        TestArchive.assert_ziprz_filenames(apath, ["0/foobar", "0/foobar/bar", "0/foobar/foo"])
 
     def test_extract(self):
         foo = os.path.join('foobar', 'foo')

@@ -44,7 +44,7 @@ class Archive(object):
             return version_count
 
     ZIP_EXT_ATTR_FILE = 0100000
-    ZIP_EXT_ATTR_DIR  = 0400000
+    ZIP_EXT_ATTR_DIR  = 0040000
     
     def _add_path(self, path, version, myzip):
         mtime = os.path.getmtime(path)
@@ -59,7 +59,7 @@ class Archive(object):
             info.external_attr = (Archive.ZIP_EXT_ATTR_DIR | clean_mode) << 16L
             # dos directory flag
             info.external_attr |= 0x10
-#            myzip.writestr(info, '')
+            myzip.writestr(info, '')
             for name in os.listdir(path):
                 self._add_path(os.path.join(path, name), version, myzip)
         elif (os.path.isfile(path)):
@@ -115,9 +115,10 @@ class Archive(object):
             if os.path.isfile(path):
                 return set([path])
             else:
-                filenames = []
+                filenames = [path]
                 for root, dirs, files in os.walk(path):
-                    filenames = filenames + [ os.path.join(root, filename) for filename in files ]
+                    filenames += [ os.path.join(root, filename) for filename in files ]
+                    filenames += [ os.path.join(root, d) for d in dirs ]
                 return set(filenames)
 
         filename_set = mk_filename_set()
@@ -140,14 +141,19 @@ class Archive(object):
 
     @staticmethod
     def _crc32(filename):
-        with open(filename, 'rb') as fd:
-            buff = fd.read(16384)
-            sofar = (binascii.crc32(buff) & 0xffffffff)
-            buff = fd.read(16384)
-            while (buff != ""):
-                sofar = (binascii.crc32(buff, sofar) & 0xffffffff)
+        if os.path.isdir(filename):
+            return 0
+        elif os.path.isfile(filename):
+            with open(filename, 'rb') as fd:
                 buff = fd.read(16384)
-            return sofar 
+                sofar = (binascii.crc32(buff) & 0xffffffff)
+                buff = fd.read(16384)
+                while (buff != ""):
+                    sofar = (binascii.crc32(buff, sofar) & 0xffffffff)
+                    buff = fd.read(16384)
+                return sofar 
+        else:
+            raise Exception()
 
     def extract(self, dest, number=None):
         """Extract a version."""
