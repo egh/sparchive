@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import re
 import binascii
@@ -10,6 +11,10 @@ class Archive(object):
     def __init__(self, archive_path):
         self.archive_path = archive_path
 
+    @staticmethod
+    def get_mtime_as_utcdatetime(path):
+        return datetime.utcfromtimestamp(os.path.getmtime(path))
+        
     @staticmethod
     def _split_path(info):
         """Splits a ZipInfo path into a versionnumber, path tuple."""

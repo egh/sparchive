@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import os
 from sparchive import rzip
 from sparchive.archive import Archive
@@ -115,3 +116,11 @@ class TestArchive(TestCase):
         assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
         shutil.rmtree(xdir)
+
+    def test_get_utc_mtime(self):
+        apath = mkstemppath()
+        with file(apath, 'a'):
+            pass
+        os.utime(apath, (978307200,  978307200)) # 1 Jan 2001, 00:00:00 UTC
+        assert_equal(datetime(2001, 1, 1, 0, 0), Archive.get_mtime_as_utcdatetime(apath))
+        os.unlink(apath)
