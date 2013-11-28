@@ -50,12 +50,12 @@ class Archive(object):
         elif (os.path.isfile(path)):
             mtime = os.path.getmtime(path)
             info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
-            myzip.writestr(info, open(path).read())
             info.extra += struct.pack('<hhBl',
                                       0x5455, # block type: "extended-timestamp"
                                       1 + 4,  # size of this block
                                       1,      # "modification time is present"
                                       mtime)  # time of last modification (UTC)
+            myzip.writestr(info, open(path).read())
         else:
             raise Exception()
 
