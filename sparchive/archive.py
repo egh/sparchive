@@ -50,11 +50,7 @@ class Archive(object):
         elif (os.path.isfile(path)):
             mtime = os.path.getmtime(path)
             info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
-            info.extra += struct.pack('<hhBl',
-                                      0x5455, # block type: "extended-timestamp"
-                                      1 + 4,  # size of this block
-                                      1,      # "modification time is present"
-                                      mtime)  # time of last modification (UTC)
+            info.extra += struct.pack('<HHBl', 0x5455, 5, 1, mtime)
             myzip.writestr(info, open(path).read())
         else:
             raise Exception()
@@ -146,10 +142,14 @@ class Archive(object):
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 for info in myzip.infolist():
-                    if number is None:
+                    if (number is None) or (Archive._split_path(info)[0] == number):
                         myzip.extract(info, dest)
-                    elif (Archive._split_path(info)[0] == number):
-                        myzip.extract(info, dest)
+                        extra = Archive.parse_extra(info.extra)
+                        if extra.has_key(0x5455):
+                            flags, mtime = struct.unpack("<Bl", extra[0x5455])
+                            if flags == 1:
+                                name = os.path.join(dest, info.filename)
+                                os.utime(name, (mtime, mtime))
     
     def list(self):
         with rzip.TempUnrzip(self.archive_path) as zippath:

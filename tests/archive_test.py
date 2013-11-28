@@ -95,6 +95,8 @@ class TestArchive(TestCase):
     def test_extract(self):
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')
+        os.utime(foo, (978307200,  978307200))
+        os.utime(bar, (978307200,  978307200))
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([foo])
@@ -114,7 +116,9 @@ class TestArchive(TestCase):
         a.extract(xdir)
         assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
         assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'foobar', 'foo')).read())
+        assert_equal(978307200.0, os.path.getmtime(os.path.join(xdir, '0', 'foobar', 'foo')))
         assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
+        assert_equal(978307200.0, os.path.getmtime(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
         shutil.rmtree(xdir)
 
@@ -145,4 +149,6 @@ class TestArchive(TestCase):
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 info = myzip.infolist()[0]
                 assert_equal(info.date_time, (2001, 1, 1, 0, 0, 0))
-                assert_equal(info.extra, struct.pack('<hhBl', 0x5455, 5, 1, 978307200))
+                extra = Archive.parse_extra(info.extra)
+                assert_true(extra.has_key(0x5455))
+                assert_equal(extra[0x5455], struct.pack('<Bl', 1, 978307200))
