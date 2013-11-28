@@ -3,6 +3,7 @@ import os
 import re
 import binascii
 from zipfile import ZipFile
+import time
 
 from sparchive import rzip
 from sparchive import mkstemppath
@@ -14,6 +15,12 @@ class Archive(object):
     @staticmethod
     def get_mtime_as_utcdatetime(path):
         return datetime.utcfromtimestamp(os.path.getmtime(path))
+
+    @staticmethod
+    def unixtime_to_ziptime(utime):
+        epoch = 315532800 # calendar.timegm((1980, 1, 1, 0, 0, 0, 1, 1, 0))
+        if utime < epoch: utime = epoch
+        return time.gmtime(utime)[:6]
         
     @staticmethod
     def _split_path(info):
