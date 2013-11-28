@@ -5,7 +5,7 @@ import os
 from sparchive import rzip
 from sparchive.archive import Archive
 from unittest import TestCase
-from nose.tools import assert_equal
+from nose.tools import *
 from sparchive import mkstemppath
 from tempfile import mkdtemp
 from zipfile import ZipFile
@@ -129,6 +129,11 @@ class TestArchive(TestCase):
     def test_unixtime_to_utcziptime(self):
         assert_equal(Archive.unixtime_to_utcziptime(978307200), (2001, 1, 1, 0, 0, 0))
 
+    def test_parseextra(self):
+        extra = Archive.parse_extra(struct.pack('<HHBl', 0x5455, 5, 1, 978307200))
+        assert_true(extra.has_key(0x5455))
+        assert_equal(extra[0x5455], struct.pack('<Bl', 1, 978307200))
+                
     def test_timestamps(self):
         foo = os.path.join('foobar', 'foo')
         os.utime(foo, (978307200,  978307200))

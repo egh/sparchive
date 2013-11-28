@@ -77,6 +77,18 @@ class Archive(object):
         os.rename(tmprzip, self.archive_path)
 
     @staticmethod
+    def parse_extra(extra_raw):
+        pos = 0
+	extra = {}
+        while (pos < len(extra_raw)):
+            header, size = struct.unpack_from('<HH', extra_raw, pos)
+            pos += 4
+            data = extra_raw[pos:(pos + size)]
+            pos += size
+            extra[header] = data
+        return extra
+
+    @staticmethod
     def _zip_versions(myzip):
         """Returns list of versions in the zip, where each version is a set
         of filename, crc tuples [[("a", crca1)], [("a", crca2), ("b", crcb2)]]".
