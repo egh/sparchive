@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 import re
 import binascii
-from zipfile import ZipFile
+from zipfile import ZipFile, ZipInfo
 import time
 
 from sparchive import rzip
@@ -47,7 +47,8 @@ class Archive(object):
             for name in os.listdir(path):
                 self._add_path(os.path.join(path, name), version, myzip)
         elif (os.path.isfile(path)):
-            myzip.write(path, "%d/%s"%(version, path))
+            info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(os.path.getmtime(path)))
+            myzip.writestr(info, open(path).read())
         else:
             raise Exception()
 
