@@ -59,6 +59,8 @@ class Archive(object):
             info.external_attr = (Archive.ZIP_EXT_ATTR_DIR | clean_mode) << 16L
             # dos directory flag
             info.external_attr |= 0x10
+            # it seems we should have a trailing slash for dirs
+            if not(info.filename.endswith('/')): info.filename = "%s/"%(info.filename)
             myzip.writestr(info, '')
             for name in os.listdir(path):
                 self._add_path(os.path.join(path, name), version, myzip)
@@ -115,10 +117,10 @@ class Archive(object):
             if os.path.isfile(path):
                 return set([path])
             else:
-                filenames = [path]
+                filenames = [path + "/"]
                 for root, dirs, files in os.walk(path):
                     filenames += [ os.path.join(root, filename) for filename in files ]
-                    filenames += [ os.path.join(root, d) for d in dirs ]
+                    filenames += [ os.path.join(root, d) + "/" for d in dirs ]
                 return set(filenames)
 
         filename_set = mk_filename_set()
