@@ -83,9 +83,8 @@ class Archive(object):
         while (pos < len(extra_raw)):
             header, size = struct.unpack_from('<HH', extra_raw, pos)
             pos += 4
-            data = extra_raw[pos:(pos + size)]
+            extra[header] = extra_raw[pos:(pos + size)]
             pos += size
-            extra[header] = data
         return extra
 
     @staticmethod
