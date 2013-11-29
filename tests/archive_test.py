@@ -98,7 +98,7 @@ class TestArchive(TestCase):
         os.utime(foo, (978307200,  978307200))
         os.utime(bar, (978307200,  978307200))
         os.chmod(foo, 0644)
-        os.chmod(bar, 0755)
+        os.chmod(bar, 07755)
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([foo])
@@ -125,7 +125,7 @@ class TestArchive(TestCase):
         assert_equal(978307200.0, os.path.getmtime(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
         print oct(os.stat(os.path.join(xdir, '1', 'foobar', 'bar')).st_mode)
-        assert_equal(0755, os.stat(os.path.join(xdir, '1', 'foobar', 'bar')).st_mode & 0000777)
+        assert_equal(07755, os.stat(os.path.join(xdir, '1', 'foobar', 'bar')).st_mode & 0007777)
         shutil.rmtree(xdir)
 
     def test_get_utc_mtime(self):

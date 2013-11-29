@@ -54,7 +54,7 @@ class Archive(object):
         info.extra += struct.pack('<HHBl', 0x5455, 5, 1, mtime)
         # http://unix.stackexchange.com/questions/14705/the-zip-formats-external-file-attribute
         # make mode without file type, which may be system-specific
-        clean_mode = os.stat(path).st_mode & 0000777
+        clean_mode = os.stat(path).st_mode & 0007777
         if (os.path.isdir(path)):
             # set zip file type to dir 
             info.external_attr = (Archive.ZIP_EXT_ATTR_DIR | clean_mode) << 16L
@@ -183,7 +183,7 @@ class Archive(object):
             flags, mtime = struct.unpack("<Bl", extra[0x5455])
             os.utime(dest, (mtime, mtime))
         # extract permissions
-        os.chmod(dest, info.external_attr >> 16L & 0000777)
+        os.chmod(dest, info.external_attr >> 16L & 0007777)
 
     def extract(self, dest, number=None):
         """Extract a version."""
