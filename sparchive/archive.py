@@ -1,3 +1,4 @@
+import shutil
 import struct
 from datetime import datetime
 import os
@@ -157,20 +158,43 @@ class Archive(object):
         else:
             raise Exception()
 
+    def _extract_entry(self, myzip, info, destdir):
+        dest = os.path.normpath(os.path.join(destdir, info.filename))
+
+        parentdirs = os.path.dirname(dest)
+        if parentdirs and not os.path.exists(parentdirs):
+            os.makedirs(parentdirs)
+
+        if (os.path.exists(dest)):
+            raise Exception()
+
+        if info.filename[-1] == '/' and not(os.path.isdir(dest)):
+            os.mkdir(dest)
+        else:
+            i = myzip.open(info)
+            o = file(dest, "wb")
+            shutil.copyfileobj(i, o)
+            i.close()
+            o.close()
+
+        # parse extended datetime
+        extra = Archive.parse_extra(info.extra)
+        if extra.has_key(0x5455):
+            flags, mtime = struct.unpack("<Bl", extra[0x5455])
+            os.utime(dest, (mtime, mtime))
+        # extract permissions
+        os.chmod(dest, info.external_attr >> 16L & 0000777)
+
     def extract(self, dest, number=None):
         """Extract a version."""
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 for info in myzip.infolist():
-                    if (number is None) or (Archive._split_path(info)[0] == number):
-                        myzip.extract(info, dest)
-                        extra = Archive.parse_extra(info.extra)
-                        if extra.has_key(0x5455):
-                            # parse extended datetime
-                            flags, mtime = struct.unpack("<Bl", extra[0x5455])
-                            name = os.path.join(dest, info.filename)
-                            os.utime(name, (mtime, mtime))
-                        os.chmod(os.path.join(dest, info.filename), info.external_attr >> 16L & 0000777)
+                    # call _split_path for every entry to ensure they
+                    # are name properly
+                    versionno, name = Archive._split_path(info)
+                    if number is None or (number == versionno):
+                        self._extract_entry(myzip, info, dest)
     
     def list(self):
         with rzip.TempUnrzip(self.archive_path) as zippath:
