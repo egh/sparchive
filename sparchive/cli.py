@@ -48,7 +48,9 @@ def main(rawargs=None):
                print "version %d:"%n
                for (p, info) in d[n]:
                     dt = datetime(*info.date_time)
-                    print "  %s  (%d, %s)"%(p, info.file_size, dt.strftime("%Y-%m-%d %H:%M:%S"))
+                    mtime = Archive.parse_extended_mtime(info)
+                    mdatetime = datetime.fromtimestamp(mtime)
+                    print "  %s  (%d, %s)"%(p, info.file_size, mdatetime.strftime("%Y-%m-%d %H:%M:%S"))
      elif args.command == "extract":
           a = Archive(args.archive)
           a.extract(".", args.version)
