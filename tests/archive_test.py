@@ -8,7 +8,7 @@ from unittest import TestCase
 from nose.tools import *
 from sparchive import mkstemppath
 from tempfile import mkdtemp
-from zipfile import ZipFile
+from zipfile import ZipFile, ZipInfo
 import time
 import shutil
 
@@ -140,7 +140,9 @@ class TestArchive(TestCase):
         assert_equal(Archive.unixtime_to_utcziptime(978307200), (2001, 1, 1, 0, 0, 0))
 
     def test_parseextra(self):
-        extra = Archive.parse_extra(struct.pack('<HHBl', 0x5455, 5, 1, 978307200))
+        info = ZipInfo("foo")
+        info.extra = struct.pack('<HHBl', 0x5455, 5, 1, 978307200)
+        extra = Archive.parse_extra(info)
         assert_true(extra.has_key(0x5455))
         assert_equal(extra[0x5455], struct.pack('<Bl', 1, 978307200))
                 
@@ -155,9 +157,8 @@ class TestArchive(TestCase):
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 info = myzip.infolist()[0]
                 assert_equal(info.date_time, (2001, 1, 1, 0, 0, 0))
-                extra = Archive.parse_extra(info.extra)
-                assert_true(extra.has_key(0x5455))
-                assert_equal(extra[0x5455], struct.pack('<Bl', 1, 978307200))
+                mtime = Archive.parse_extended_mtime(info)
+                assert_equal(978307200, mtime)
 
     def test_external_attr(self):
         foo = os.path.join('foobar', 'foo')

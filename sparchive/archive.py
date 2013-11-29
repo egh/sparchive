@@ -23,7 +23,7 @@ class Archive(object):
         epoch = 315532800 # calendar.timegm((1980, 1, 1, 0, 0, 0, 1, 1, 0))
         if utime < epoch: utime = epoch
         return time.gmtime(utime)[:6]
-
+    
     @staticmethod
     def _split_path(info):
         """Splits a ZipInfo path into a versionnumber, path tuple."""
@@ -89,15 +89,24 @@ class Archive(object):
         os.rename(tmprzip, self.archive_path)
 
     @staticmethod
-    def parse_extra(extra_raw):
+    def parse_extra(info):
         pos = 0
 	extra = {}
-        while (pos < len(extra_raw)):
-            header, size = struct.unpack_from('<HH', extra_raw, pos)
+        while (pos < len(info.extra)):
+            header, size = struct.unpack_from('<HH', info.extra, pos)
             pos += 4
-            extra[header] = extra_raw[pos:(pos + size)]
+            extra[header] = info.extra[pos:(pos + size)]
             pos += size
         return extra
+
+    @staticmethod
+    def parse_extended_mtime(info):
+        extra = Archive.parse_extra(info)
+        if extra.has_key(0x5455):
+            flags, mtime = struct.unpack("<Bl", extra[0x5455])
+            return mtime
+        else:
+            return None
 
     @staticmethod
     def _zip_versions(myzip):
@@ -178,9 +187,8 @@ class Archive(object):
             o.close()
 
         # parse extended datetime
-        extra = Archive.parse_extra(info.extra)
-        if extra.has_key(0x5455):
-            flags, mtime = struct.unpack("<Bl", extra[0x5455])
+        mtime = Archive.parse_extended_mtime(info)
+        if mtime is not None:
             os.utime(dest, (mtime, mtime))
         # extract permissions
         os.chmod(dest, info.external_attr >> 16L & 0007777)
