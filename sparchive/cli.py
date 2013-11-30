@@ -39,9 +39,9 @@ def main(rawargs=None):
           for p in args.version_path:
                result = filer.file(p)
                if result[0]:
-                    sys.stderr.write("%s archived in %s.\n"%(p, result[2].archive_path))
+                    sys.stdout.write("%s archived in %s\n"%(p, result[2].archive_path))
                else:
-                    sys.stderr.write("%s is already archived in version %d of %s.\n"%(p, result[1], result[2].archive_path))
+                    sys.stdout.write("%s is already archived in version %d of %s\n"%(p, result[1], result[2].archive_path))
      elif args.command == "list":
           d = Archive(args.archive).list()
           for n in sorted(d.keys()):
