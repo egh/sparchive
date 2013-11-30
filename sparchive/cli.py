@@ -11,7 +11,7 @@ def main(rawargs=None):
      subparsers = parser.add_subparsers()
 
      filer = subparsers.add_parser('file')
-     filer.add_argument('-r', '--root', help='root of archive', default='/home/egh/a.new/')
+     filer.add_argument('-r', '--root', help='root of archive', default='/home/egh/a/')
      filer.add_argument('version_path', nargs="+", help='paths to version to add', default=None)
      filer.set_defaults(command='file')
 
