@@ -34,7 +34,7 @@ class CliTest(TestCase):
                 filenames = []
                 for info in myzip.infolist():
                     filenames.append(info.filename)
-                assert_equal(filenames, ["0/foobar/foo", "1/foobar/bar"])
+                assert_equal(filenames, ["versions/0/foobar/foo", "versions/1/foobar/bar"])
         sparchive.cli.main(["list", a])
         
     def test_cli_file(self):
@@ -47,7 +47,7 @@ class CliTest(TestCase):
         a = mkstemppath()
         os.chdir('foobar')
         sparchive.cli.main(['addversion', a, 'foo', 'bar'])
-        CliTest.assert_ziprz_filenames(a, ['0/foo', '0/bar'])
+        CliTest.assert_ziprz_filenames(a, ['versions/0/foo', 'versions/0/bar'])
 
     def test_cli_extract(self):
         a = mkstemppath()
@@ -60,8 +60,9 @@ class CliTest(TestCase):
         os.chdir(os.path.join(xdir))
         sparchive.cli.main(["extract", a])
         os.chdir(olddir)
+        xdir = os.path.join(xdir, os.path.basename(a))
         assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
         assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'foobar', 'foo')).read())
-        assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
+        assert(os.path.exists(os.path.join(xdir,'1', 'foobar', 'bar')))
         assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
 #        shutil.rmtree(xdir)

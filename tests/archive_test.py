@@ -64,18 +64,19 @@ class TestArchive(TestCase):
         a = Archive(apath)
         a.add_version([foo])
         a.add_version([bar])
-        TestArchive.assert_ziprz_filenames(apath, ["0/foobar/foo", "1/foobar/bar"])
+        TestArchive.assert_ziprz_filenames(apath, ["versions/0/foobar/foo", "versions/1/foobar/bar"])
 
     def test_add_unicode_file(self):
         i = "“Iñtërnâtiônàlizætiøn”"
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([i])
-        TestArchive.assert_ziprz_filenames(apath, ["0/“Iñtërnâtiônàlizætiøn”"])
+        TestArchive.assert_ziprz_filenames(apath, ["versions/0/“Iñtërnâtiônàlizætiøn”"])
         xdir = mkdtemp()
         a.extract(xdir, 0)
-        assert(os.path.exists(os.path.join(xdir, '0', "“Iñtërnâtiônàlizætiøn”")))
-        assert_equal(open(i).read(), open(os.path.join(xdir, '0', '“Iñtërnâtiônàlizætiøn”')).read())
+        versiondir = os.path.join(xdir, os.path.basename(apath))
+        assert(os.path.exists(os.path.join(versiondir, '0', "“Iñtërnâtiônàlizætiøn”")))
+        assert_equal(open(i).read(), open(os.path.join(versiondir, '0', '“Iñtërnâtiônàlizætiøn”')).read())
 
     def test_add_100_versions(self):
         foo = os.path.join('foobar', 'foo')
@@ -83,14 +84,14 @@ class TestArchive(TestCase):
         a = Archive(apath)
         for n in range(0, 100):
             a.add_version([foo])
-        TestArchive.assert_ziprz_filenames(apath, [ "%d/foobar/foo"%(n) for n in range(0, 100) ])
+        TestArchive.assert_ziprz_filenames(apath, [ "versions/%d/foobar/foo"%(n) for n in range(0, 100) ])
 
     def test_add_dir(self):
         dir = 'foobar'
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([dir])
-        TestArchive.assert_ziprz_filenames(apath, ["0/foobar/", "0/foobar/symlink", "0/foobar/bar", "0/foobar/foo"])
+        TestArchive.assert_ziprz_filenames(apath, ["versions/0/foobar/", "versions/0/foobar/symlink", "versions/0/foobar/bar", "versions/0/foobar/foo"])
 
     def test_extract(self):
         foo = os.path.join('foobar', 'foo')
@@ -106,30 +107,32 @@ class TestArchive(TestCase):
         a.add_version(['foobar'])
         xdir = mkdtemp()
         a.extract(xdir, 0)
-        assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
-        assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'foobar', 'foo')).read())
+        versiondir = os.path.join(xdir, os.path.basename(apath))
+        assert(os.path.exists(os.path.join(versiondir, '0', 'foobar', 'foo')))
+        assert_equal(open(foo).read(), open(os.path.join(versiondir, '0', 'foobar', 'foo')).read())
 
         a.extract(xdir, 1)
-        assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
-        assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
+        assert(os.path.exists(os.path.join(versiondir, '1', 'foobar', 'bar')))
+        assert_equal(open(bar).read(), open(os.path.join(versiondir, '1', 'foobar', 'bar')).read())
         shutil.rmtree(xdir)
 
         # now extract all versions
         xdir = mkdtemp()
+        versiondir = os.path.join(xdir, os.path.basename(apath))
         a.extract(xdir)
-        assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
-        assert_equal(open(foo).read(), open(os.path.join(xdir, '0', 'foobar', 'foo')).read())
-        assert_equal(978307200.0, os.path.getmtime(os.path.join(xdir, '0', 'foobar', 'foo')))
-        assert_equal(0644, os.stat(os.path.join(xdir, '0', 'foobar', 'foo')).st_mode & 0000777)
+        assert(os.path.exists(os.path.join(versiondir, '0', 'foobar', 'foo')))
+        assert_equal(open(foo).read(), open(os.path.join(versiondir, '0', 'foobar', 'foo')).read())
+        assert_equal(978307200.0, os.path.getmtime(os.path.join(versiondir, '0', 'foobar', 'foo')))
+        assert_equal(0644, os.stat(os.path.join(versiondir, '0', 'foobar', 'foo')).st_mode & 0000777)
 
-        assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
-        assert_equal(978307200.0, os.path.getmtime(os.path.join(xdir, '1', 'foobar', 'bar')))
-        assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
-        assert_equal(07755, os.stat(os.path.join(xdir, '1', 'foobar', 'bar')).st_mode & 0007777)
+        assert(os.path.exists(os.path.join(versiondir, '1', 'foobar', 'bar')))
+        assert_equal(978307200.0, os.path.getmtime(os.path.join(versiondir, '1', 'foobar', 'bar')))
+        assert_equal(open(bar).read(), open(os.path.join(versiondir, '1', 'foobar', 'bar')).read())
+        assert_equal(07755, os.stat(os.path.join(versiondir, '1', 'foobar', 'bar')).st_mode & 0007777)
 
         #check symlink
-        assert(os.path.exists(os.path.join(xdir, '2', 'foobar', 'symlink')))
-        assert_equal('foo', os.readlink(os.path.join(xdir, '2', 'foobar', 'symlink')))
+        assert(os.path.exists(os.path.join(versiondir, '2', 'foobar', 'symlink')))
+        assert_equal('foo', os.readlink(os.path.join(versiondir, '2', 'foobar', 'symlink')))
 
         shutil.rmtree(xdir)
 
@@ -184,9 +187,9 @@ class TestArchive(TestCase):
         with rzip.TempUnrzip(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 for info in myzip.infolist():
-                    if info.filename == "0/foobar/symlink":
+                    if info.filename == "versions/0/foobar/symlink":
                         assert_true(Archive.islink_entry(info))
-                    elif info.filename == "0/foobar/":
+                    elif info.filename == "versions/0/foobar/":
                         assert_true(Archive.isdir_entry(info))
                     else:
                         assert_true(not(Archive.isdir_entry(info)) and not(Archive.islink_entry(info)))

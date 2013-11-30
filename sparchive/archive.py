@@ -27,7 +27,7 @@ class Archive(object):
     @staticmethod
     def _split_path(info):
         """Splits a ZipInfo path into a versionnumber, path tuple."""
-        md = re.match(r"^([0-9]+)/(.*)$", info.filename)
+        md = re.match(r"^versions/([0-9]+)/(.*)$", info.filename)
         if md is None:
             raise Exception()
         return (int(md.group(1)), md.group(2))
@@ -50,7 +50,7 @@ class Archive(object):
 
     def _add_path(self, path, version, myzip):
         mtime = os.path.getmtime(path)
-        info = ZipInfo("%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
+        info = ZipInfo("versions/%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
         info.create_system = 3
         info.extra += struct.pack('<HHBl', 0x5455, 5, 1, mtime)
         # http://unix.stackexchange.com/questions/14705/the-zip-formats-external-file-attribute
@@ -183,8 +183,7 @@ class Archive(object):
         return ((info.external_attr >> 16L) & Archive.ZIP_EXT_ATTR_DIR) == Archive.ZIP_EXT_ATTR_DIR
 
     def _extract_entry(self, myzip, info, destdir):
-        dest = os.path.normpath(os.path.join(destdir, info.filename))
-
+        dest = os.path.normpath(os.path.join(destdir, info.filename[9:])) # drop leading versions/
         parentdirs = os.path.dirname(dest)
         if parentdirs and not os.path.exists(parentdirs):
             os.makedirs(parentdirs)
@@ -216,6 +215,7 @@ class Archive(object):
 
     def extract(self, dest, number=None):
         """Extract a version."""
+        archivename = os.path.basename(self.archive_path).split('.')[0]
         with rzip.TempUnrzip(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 for info in myzip.infolist():
@@ -223,7 +223,7 @@ class Archive(object):
                     # are name properly
                     versionno, name = Archive._split_path(info)
                     if number is None or (number == versionno):
-                        self._extract_entry(myzip, info, dest)
+                        self._extract_entry(myzip, info, os.path.join(dest, archivename))
     
     def list(self):
         with rzip.TempUnrzip(self.archive_path) as zippath:
