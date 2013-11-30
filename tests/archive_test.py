@@ -90,7 +90,7 @@ class TestArchive(TestCase):
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([dir])
-        TestArchive.assert_ziprz_filenames(apath, ["0/foobar/", "0/foobar/bar", "0/foobar/foo"])
+        TestArchive.assert_ziprz_filenames(apath, ["0/foobar/", "0/foobar/symlink", "0/foobar/bar", "0/foobar/foo"])
 
     def test_extract(self):
         foo = os.path.join('foobar', 'foo')
@@ -103,6 +103,7 @@ class TestArchive(TestCase):
         a = Archive(apath)
         a.add_version([foo])
         a.add_version([bar])
+        a.add_version(['foobar'])
         xdir = mkdtemp()
         a.extract(xdir, 0)
         assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
@@ -124,8 +125,12 @@ class TestArchive(TestCase):
         assert(os.path.exists(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(978307200.0, os.path.getmtime(os.path.join(xdir, '1', 'foobar', 'bar')))
         assert_equal(open(bar).read(), open(os.path.join(xdir, '1', 'foobar', 'bar')).read())
-        print oct(os.stat(os.path.join(xdir, '1', 'foobar', 'bar')).st_mode)
         assert_equal(07755, os.stat(os.path.join(xdir, '1', 'foobar', 'bar')).st_mode & 0007777)
+
+        #check symlink
+        assert(os.path.exists(os.path.join(xdir, '2', 'foobar', 'symlink')))
+        assert_equal('foo', os.readlink(os.path.join(xdir, '2', 'foobar', 'symlink')))
+
         shutil.rmtree(xdir)
 
     def test_get_utc_mtime(self):
@@ -170,3 +175,18 @@ class TestArchive(TestCase):
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 info = myzip.infolist()[0]
                 assert_equal(info.external_attr, 0100644 << 16L)
+
+    def test_is_entries(self):
+        foo = os.path.join('foobar')
+        apath = mkstemppath()
+        a = Archive(apath)
+        a.add_version([foo])
+        with rzip.TempUnrzip(apath) as zippath:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
+                for info in myzip.infolist():
+                    if info.filename == "0/foobar/symlink":
+                        assert_true(Archive.islink_entry(info))
+                    elif info.filename == "0/foobar/":
+                        assert_true(Archive.isdir_entry(info))
+                    else:
+                        assert_true(not(Archive.isdir_entry(info)) and not(Archive.islink_entry(info)))
