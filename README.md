@@ -42,6 +42,17 @@ compressed. So if, like me, you often end up with multiple directories
 with similar files, you can safely file them away and sparchive will
 store them in an efficent manner.
 
+Installation
+------------
+
+sparchive is developed on Linux and should work on any Unix (including
+Mac OS X). It is written in Python 2.7 and requires an rzip binary.
+Running:
+
+    python setup.py install
+
+possibly as sudo, should be sufficient to install.
+
 File format
 -----------
 
