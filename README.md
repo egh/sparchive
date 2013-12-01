@@ -56,15 +56,19 @@ possibly as sudo, should be sufficient to install.
 File format
 -----------
 
-sparchive files are standard ZIP files which should conform to the
-following specification:
+sparchive first stores data in standard ZIP files. sparchive *stores*
+data in the ZIP; it does not *compress* (deflate) the data.
+Compression is handled by rzip. rzip is capable of exploiting
+similarities between files (and therefore between versions), and so
+should achieve very good compression ratios for similar versions. As a
+quick example, I created a sparchive file containing 10 versions of a
+SQL dump (which did not change much from day to day), each version of
+which takes up 12MB (uncompressed) or about 4.3MB gzipped. The
+sparchive file was 2.2 MB.
 
-  http://www.idpf.org/epub/30/spec/epub30-ocf.html#physical-container-zip
-
-(Not the whole spec, just that pertaining to ZIP files.)
+### Some more details about the ZIP ###
 
 sparchive files use the extended timestamp extra field to store last
 modified time, and the external attributes to store permissions (but
 not owners). Timestamps and permissions should be preserved for files
 and directories.
-
