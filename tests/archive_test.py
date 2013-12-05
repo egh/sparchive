@@ -170,14 +170,14 @@ class TestArchive(TestCase):
 
     def test_external_attr(self):
         foo = os.path.join('foobar', 'foo')
-        os.chmod(foo, 0644)
+        os.chmod(foo, 0o644)
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([foo])
         with rzip.TempUnrzip(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 info = myzip.infolist()[0]
-                assert_equal(info.external_attr, 0100644 << 16L)
+                assert_equal(info.external_attr, 0o100644 << 16)
 
     def test_is_entries(self):
         foo = os.path.join('foobar')
