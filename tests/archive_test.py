@@ -98,8 +98,8 @@ class TestArchive(TestCase):
         bar = os.path.join('foobar', 'bar')
         os.utime(foo, (978307200,  978307200))
         os.utime(bar, (978307200,  978307200))
-        os.chmod(foo, 0644)
-        os.chmod(bar, 07755)
+        os.chmod(foo, 0o644)
+        os.chmod(bar, 0o7755)
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([foo])
@@ -123,12 +123,12 @@ class TestArchive(TestCase):
         assert(os.path.exists(os.path.join(versiondir, '0', 'foobar', 'foo')))
         assert_equal(open(foo).read(), open(os.path.join(versiondir, '0', 'foobar', 'foo')).read())
         assert_equal(978307200.0, os.path.getmtime(os.path.join(versiondir, '0', 'foobar', 'foo')))
-        assert_equal(0644, os.stat(os.path.join(versiondir, '0', 'foobar', 'foo')).st_mode & 0000777)
+        assert_equal(0o644, os.stat(os.path.join(versiondir, '0', 'foobar', 'foo')).st_mode & 0o000777)
 
         assert(os.path.exists(os.path.join(versiondir, '1', 'foobar', 'bar')))
         assert_equal(978307200.0, os.path.getmtime(os.path.join(versiondir, '1', 'foobar', 'bar')))
-        assert_equal(open(bar).read(), open(os.path.join(versiondir, '1', 'foobar', 'bar')).read())
-        assert_equal(07755, os.stat(os.path.join(versiondir, '1', 'foobar', 'bar')).st_mode & 0007777)
+        assert_equal(open(bar, 'rb').read(), open(os.path.join(versiondir, '1', 'foobar', 'bar'), 'rb').read())
+        assert_equal(0o7755, os.stat(os.path.join(versiondir, '1', 'foobar', 'bar')).st_mode & 0o007777)
 
         #check symlink
         assert(os.path.exists(os.path.join(versiondir, '2', 'foobar', 'symlink')))

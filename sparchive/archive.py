@@ -44,9 +44,9 @@ class Archive(object):
                         version_count = (this_version+1)
             return version_count
 
-    ZIP_EXT_ATTR_FILE = 0o100000L
-    ZIP_EXT_ATTR_DIR  = 0o040000L
-    ZIP_EXT_ATTR_LINK = 0o120000L
+    ZIP_EXT_ATTR_FILE = 0o100000
+    ZIP_EXT_ATTR_DIR  = 0o040000
+    ZIP_EXT_ATTR_LINK = 0o120000
 
     def _add_path(self, path, version, myzip):
         mtime = os.path.getmtime(path)
@@ -58,11 +58,11 @@ class Archive(object):
         clean_mode = os.stat(path).st_mode & 0o007777
         if (os.path.islink(path)):
             # set zip file type to link
-            info.external_attr = (Archive.ZIP_EXT_ATTR_LINK | clean_mode) << 16L
+            info.external_attr = (Archive.ZIP_EXT_ATTR_LINK | clean_mode) << 16
             myzip.writestr(info, os.readlink(path))
         elif (os.path.isdir(path)):
             # set zip file type to dir 
-            info.external_attr = (Archive.ZIP_EXT_ATTR_DIR | clean_mode) << 16L
+            info.external_attr = (Archive.ZIP_EXT_ATTR_DIR | clean_mode) << 16
             # dos directory flag
             info.external_attr |= 0x10
             # it seems we should have a trailing slash for dirs
@@ -71,8 +71,8 @@ class Archive(object):
             for name in os.listdir(path):
                 self._add_path(os.path.join(path, name), version, myzip)
         elif (os.path.isfile(path)):
-            info.external_attr = (Archive.ZIP_EXT_ATTR_FILE | clean_mode) << 16L
-            myzip.writestr(info, open(path).read())
+            info.external_attr = (Archive.ZIP_EXT_ATTR_FILE | clean_mode) << 16
+            myzip.writestr(info, open(path, 'rb').read())
         else:
             raise Exception()
 
@@ -176,11 +176,11 @@ class Archive(object):
 
     @staticmethod
     def islink_entry(info):
-        return ((info.external_attr >> 16L) & Archive.ZIP_EXT_ATTR_LINK) == Archive.ZIP_EXT_ATTR_LINK
+        return ((info.external_attr >> 16) & Archive.ZIP_EXT_ATTR_LINK) == Archive.ZIP_EXT_ATTR_LINK
 
     @staticmethod
     def isdir_entry(info):
-        return ((info.external_attr >> 16L) & Archive.ZIP_EXT_ATTR_DIR) == Archive.ZIP_EXT_ATTR_DIR
+        return ((info.external_attr >> 16) & Archive.ZIP_EXT_ATTR_DIR) == Archive.ZIP_EXT_ATTR_DIR
 
     def _extract_entry(self, myzip, info, destdir):
         dest = os.path.normpath(os.path.join(destdir, info.filename[9:])) # drop leading versions/
@@ -211,7 +211,7 @@ class Archive(object):
             if mtime is not None:
                 os.utime(dest, (mtime, mtime))
             # extract permissions
-            os.chmod(dest, info.external_attr >> 16L & 0o007777)
+            os.chmod(dest, info.external_attr >> 16 & 0o007777)
 
     def extract(self, dest, number=None):
         """Extract a version."""
