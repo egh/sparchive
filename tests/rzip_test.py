@@ -13,7 +13,7 @@ class TestRzip(TestCase):
         assert(not(os.path.exists(prz)))
         rzip.compress(p, prz)
         assert(os.path.exists(prz))
-        assert_equal(hashlib.md5(open(prz).read()).hexdigest(), "dfa5ce71cda1c59f44eef332d4cb98cd")
+        assert_equal(hashlib.md5(open(prz, 'rb').read()).hexdigest(), "dfa5ce71cda1c59f44eef332d4cb98cd")
         os.unlink(prz)
 
     def test_uncompress_file(self):

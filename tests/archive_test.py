@@ -76,7 +76,7 @@ class TestArchive(TestCase):
         a.extract(xdir, 0)
         versiondir = os.path.join(xdir, os.path.basename(apath))
         assert(os.path.exists(os.path.join(versiondir, '0', "“Iñtërnâtiônàlizætiøn”")))
-        assert_equal(open(i).read(), open(os.path.join(versiondir, '0', '“Iñtërnâtiônàlizætiøn”')).read())
+        assert_equal(open(i, 'rb').read(), open(os.path.join(versiondir, '0', '“Iñtërnâtiônàlizætiøn”'), 'rb').read())
 
     def test_add_100_versions(self):
         foo = os.path.join('foobar', 'foo')
@@ -109,11 +109,11 @@ class TestArchive(TestCase):
         a.extract(xdir, 0)
         versiondir = os.path.join(xdir, os.path.basename(apath))
         assert(os.path.exists(os.path.join(versiondir, '0', 'foobar', 'foo')))
-        assert_equal(open(foo).read(), open(os.path.join(versiondir, '0', 'foobar', 'foo')).read())
+        assert_equal(open(foo, 'rb').read(), open(os.path.join(versiondir, '0', 'foobar', 'foo'), 'rb').read())
 
         a.extract(xdir, 1)
         assert(os.path.exists(os.path.join(versiondir, '1', 'foobar', 'bar')))
-        assert_equal(open(bar).read(), open(os.path.join(versiondir, '1', 'foobar', 'bar')).read())
+        assert_equal(open(bar, 'rb').read(), open(os.path.join(versiondir, '1', 'foobar', 'bar'), 'rb').read())
         shutil.rmtree(xdir)
 
         # now extract all versions
@@ -121,7 +121,7 @@ class TestArchive(TestCase):
         versiondir = os.path.join(xdir, os.path.basename(apath))
         a.extract(xdir)
         assert(os.path.exists(os.path.join(versiondir, '0', 'foobar', 'foo')))
-        assert_equal(open(foo).read(), open(os.path.join(versiondir, '0', 'foobar', 'foo')).read())
+        assert_equal(open(foo, 'rb').read(), open(os.path.join(versiondir, '0', 'foobar', 'foo'), 'rb').read())
         assert_equal(978307200.0, os.path.getmtime(os.path.join(versiondir, '0', 'foobar', 'foo')))
         assert_equal(0o644, os.stat(os.path.join(versiondir, '0', 'foobar', 'foo')).st_mode & 0o000777)
 

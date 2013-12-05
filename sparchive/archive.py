@@ -192,7 +192,7 @@ class Archive(object):
             raise Exception()
 
         if Archive.islink_entry(info):
-            i = myzip.open(info)
+            i = myzip.open(info, 'r')
             target = i.read()
             i.close()
             os.symlink(target, dest)
@@ -200,7 +200,7 @@ class Archive(object):
             if (info.filename[-1] == '/' or Archive.isdir_entry(info)) and not(os.path.isdir(dest)):
                 os.mkdir(dest)
             else:
-                i = myzip.open(info)
+                i = myzip.open(info, 'r')
                 o = file(dest, "wb")
                 shutil.copyfileobj(i, o)
                 i.close()
