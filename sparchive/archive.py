@@ -96,7 +96,7 @@ class Archive(object):
     @staticmethod
     def parse_extra(info):
         pos = 0
-	extra = {}
+        extra = {}
         while (pos < len(info.extra)):
             header, size = struct.unpack_from('<HH', info.extra, pos)
             pos += 4
