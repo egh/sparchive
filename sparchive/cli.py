@@ -45,12 +45,12 @@ def main(rawargs=None):
      elif args.command == "list":
           d = Archive(args.archive).list()
           for n in sorted(d.keys()):
-               print "version %d:"%(n)
+               print("version %d:"%(n))
                for (p, info) in d[n]:
                     dt = datetime(*info.date_time)
                     mtime = Archive.parse_extended_mtime(info)
                     mdatetime = datetime.fromtimestamp(mtime)
-                    print "  %s  (%d, %s)"%(p, info.file_size, mdatetime.strftime("%Y-%m-%d %H:%M:%S"))
+                    print("  %s  (%d, %s)"%(p, info.file_size, mdatetime.strftime("%Y-%m-%d %H:%M:%S")))
      elif args.command == "extract":
           a = Archive(args.archive)
           a.extract(".", args.version)
