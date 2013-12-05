@@ -23,7 +23,7 @@ class TestArchive(TestCase):
     def assert_ziprz_filenames(path, filenames):
         with rzip.TempUnrzip(path) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
-                assert_equal(filenames, [ info.filename for info in myzip.infolist() ])
+                assert_equal(set(filenames), set([ info.filename for info in myzip.infolist() ]))
 
     def test_crc32(self):
         assert_equal('ffab723a', "%x"%(Archive._crc32(os.path.join('foobar', 'foo'))))
