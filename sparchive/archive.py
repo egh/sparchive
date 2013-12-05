@@ -44,9 +44,9 @@ class Archive(object):
                         version_count = (this_version+1)
             return version_count
 
-    ZIP_EXT_ATTR_FILE = 0100000L
-    ZIP_EXT_ATTR_DIR  = 0040000L
-    ZIP_EXT_ATTR_LINK = 0120000L
+    ZIP_EXT_ATTR_FILE = 0o100000L
+    ZIP_EXT_ATTR_DIR  = 0o040000L
+    ZIP_EXT_ATTR_LINK = 0o120000L
 
     def _add_path(self, path, version, myzip):
         mtime = os.path.getmtime(path)
@@ -55,7 +55,7 @@ class Archive(object):
         info.extra += struct.pack('<HHBl', 0x5455, 5, 1, mtime)
         # http://unix.stackexchange.com/questions/14705/the-zip-formats-external-file-attribute
         # make mode without file type, which may be system-specific
-        clean_mode = os.stat(path).st_mode & 0007777
+        clean_mode = os.stat(path).st_mode & 0o007777
         if (os.path.islink(path)):
             # set zip file type to link
             info.external_attr = (Archive.ZIP_EXT_ATTR_LINK | clean_mode) << 16L
@@ -211,7 +211,7 @@ class Archive(object):
             if mtime is not None:
                 os.utime(dest, (mtime, mtime))
             # extract permissions
-            os.chmod(dest, info.external_attr >> 16L & 0007777)
+            os.chmod(dest, info.external_attr >> 16L & 0o007777)
 
     def extract(self, dest, number=None):
         """Extract a version."""
