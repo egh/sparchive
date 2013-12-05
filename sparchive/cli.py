@@ -45,7 +45,7 @@ def main(rawargs=None):
      elif args.command == "list":
           d = Archive(args.archive).list()
           for n in sorted(d.keys()):
-               print "version %d:"%n
+               print "version %d:"%(n)
                for (p, info) in d[n]:
                     dt = datetime(*info.date_time)
                     mtime = Archive.parse_extended_mtime(info)
