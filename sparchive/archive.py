@@ -163,14 +163,13 @@ class Archive(object):
         elif os.path.isdir(filename):
             return 0
         elif os.path.isfile(filename):
-            with open(filename, 'rb') as fd:
-                buff = fd.read(16384)
-                sofar = (binascii.crc32(buff) & 0xffffffff)
-                buff = fd.read(16384)
-                while (buff != ""):
+            with open(filename, 'rb') as i:
+                sofar = 0
+                buff = i.read(16384)
+                while (buff != b""):
                     sofar = (binascii.crc32(buff, sofar) & 0xffffffff)
-                    buff = fd.read(16384)
-                return sofar 
+                    buff = i.read(16384)
+                return sofar
         else:
             raise Exception()
 
