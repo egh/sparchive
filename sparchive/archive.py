@@ -52,7 +52,7 @@ class Archive(object):
         mtime = os.path.getmtime(path)
         info = ZipInfo("versions/%d/%s"%(version, path), Archive.unixtime_to_utcziptime(mtime))
         info.create_system = 3
-        info.extra += struct.pack('<HHBl', 0x5455, 5, 1, mtime)
+        info.extra += struct.pack('<HHBl', 0x5455, 5, 1, int(mtime))
         # http://unix.stackexchange.com/questions/14705/the-zip-formats-external-file-attribute
         # make mode without file type, which may be system-specific
         clean_mode = os.stat(path).st_mode & 0o007777
@@ -107,7 +107,7 @@ class Archive(object):
     @staticmethod
     def parse_extended_mtime(info):
         extra = Archive.parse_extra(info)
-        if extra.has_key(0x5455):
+        if 0x5455 in extra:
             flags, mtime = struct.unpack("<Bl", extra[0x5455])
             return mtime
         else:
@@ -159,7 +159,7 @@ class Archive(object):
     @staticmethod
     def _crc32(filename):
         if os.path.islink(filename):
-            return binascii.crc32(os.readlink(filename)) & 0xffffffff
+            return binascii.crc32(os.readlink(filename).encode('utf-8')) & 0xffffffff
         elif os.path.isdir(filename):
             return 0
         elif os.path.isfile(filename):
@@ -200,7 +200,7 @@ class Archive(object):
                 os.mkdir(dest)
             else:
                 i = myzip.open(info, 'r')
-                o = file(dest, "wb")
+                o = open(dest, "wb")
                 shutil.copyfileobj(i, o)
                 i.close()
                 o.close()
@@ -230,6 +230,6 @@ class Archive(object):
                 retval = {}
                 for info in myzip.infolist():
                     (version, path) = Archive._split_path(info)
-                    if not(retval.has_key(version)): retval[version] = []
+                    if not(version in retval): retval[version] = []
                     retval[version].append((path, info))
                 return retval

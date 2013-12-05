@@ -138,7 +138,7 @@ class TestArchive(TestCase):
 
     def test_get_utc_mtime(self):
         apath = mkstemppath()
-        with file(apath, 'a'):
+        with open(apath, 'a'):
             pass
         os.utime(apath, (978307200,  978307200)) # 1 Jan 2001, 00:00:00 UTC
         assert_equal(datetime(2001, 1, 1, 0, 0), Archive.get_mtime_as_utcdatetime(apath))
@@ -151,7 +151,7 @@ class TestArchive(TestCase):
         info = ZipInfo("foo")
         info.extra = struct.pack('<HHBl', 0x5455, 5, 1, 978307200)
         extra = Archive.parse_extra(info)
-        assert_true(extra.has_key(0x5455))
+        assert_true(0x5455 in extra)
         assert_equal(extra[0x5455], struct.pack('<Bl', 1, 978307200))
                 
     def test_timestamps(self):
