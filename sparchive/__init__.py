@@ -2,8 +2,9 @@ import os
 import tempfile
 
 def mkstemppath(suffix='', prefix='tmp', dir=None, text=False):
-     (fd, path) = tempfile.mkstemp(suffix, prefix, dir, text)
-     os.close(fd)
-     os.unlink(path)
-     return path
+     """Return the name of a temporary file that we can use."""
+     f = tempfile.NamedTemporaryFile(delete=True)
+     name = f.name
+     f.close()
+     return name
 
