@@ -42,6 +42,14 @@ compressed. So if, like me, you often end up with multiple directories
 with similar files, you can safely file them away and sparchive will
 store them in an efficent manner.
 
+Extracting
+----------
+
+When extacting an archive (using `sparchive extract`), sparchive will
+create a directory in the current working directory with the same name
+as the archive, e.g. for an archive named `foo.zip.rz` it will create
+a directory named `foo`. 
+
 Installation
 ------------
 
