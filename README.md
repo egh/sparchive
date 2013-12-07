@@ -74,6 +74,12 @@ SQL dump (which did not change much from day to day), each version of
 which takes up 12MB (uncompressed) or about 4.3MB gzipped. The
 sparchive file was 2.2 MB.
 
+### zip directory structure ###
+
+sparchive stores each version in a directory with the version number
+(starting from 1) as the name of the directory. These directories are
+stored under a `versions` directory at the toplevel of the zip file.
+
 ### Some more details about the ZIP ###
 
 sparchive files use the extended timestamp extra field to store last
