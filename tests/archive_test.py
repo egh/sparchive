@@ -14,10 +14,11 @@ import shutil
 
 class TestArchive(TestCase):
     def setUp(self):
+        self.oldcwd = os.getcwd()
         os.chdir(os.path.join('tests', 'fixtures'))
 
     def tearDown(self):
-        os.chdir(os.path.join('..', '..'))
+        os.chdir(self.oldcwd)
 
     @staticmethod
     def assert_ziprz_filenames(path, filenames):

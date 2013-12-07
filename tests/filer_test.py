@@ -34,9 +34,11 @@ class FilerTest(TestCase):
         olddir = os.getcwd()
         rootdir = mkdtemp()
         filer = Filer(rootdir)
-        os.chdir(path.join('tests', 'fixtures'))
-        results = filer.file('foobar')
-        assert_equal(results[0], True)
-        assert_equal(results[1], 0)
-        assert(os.path.exists(os.path.join(rootdir, '2001', '01', 'foobar.zip.rz')))
-        os.chdir(olddir)
+        try:
+            os.chdir(path.join('tests', 'fixtures'))
+            results = filer.file('foobar')
+            assert_equal(results[0], True)
+            assert_equal(results[1], 0)
+            assert(os.path.exists(os.path.join(rootdir, '2001', '01', 'foobar.zip.rz')))
+        finally:
+            os.chdir(olddir)

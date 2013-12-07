@@ -57,9 +57,11 @@ class CliTest(TestCase):
         sparchive.cli.main(["addversion", a, bar])
         xdir = mkdtemp()
         olddir = os.getcwd()
-        os.chdir(os.path.join(xdir))
-        sparchive.cli.main(["extract", a])
-        os.chdir(olddir)
+        try:
+            os.chdir(os.path.join(xdir))
+            sparchive.cli.main(["extract", a])
+        finally:
+            os.chdir(olddir)
         xdir = os.path.join(xdir, os.path.basename(a))
         assert(os.path.exists(os.path.join(xdir, '0', 'foobar', 'foo')))
         assert_equal(open(foo, 'rb').read(), open(os.path.join(xdir, '0', 'foobar', 'foo'), 'rb').read())
