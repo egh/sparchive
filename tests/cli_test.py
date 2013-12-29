@@ -18,7 +18,7 @@ class CliTest(TestCase):
 
     @staticmethod
     def assert_ziprz_filenames(path, filenames):
-        with rzip.TempUnrzip(path) as zippath:
+        with rzip.TempUncompress(path) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 assert_equal(set(filenames), set([ info.filename for info in myzip.infolist() ]))
 
@@ -29,7 +29,7 @@ class CliTest(TestCase):
         sparchive.cli.main(["addversion", a, foo])
         sparchive.cli.main(["addversion", a, bar])
         assert(os.path.exists(a))
-        with rzip.TempUnrzip(a) as zippath:
+        with rzip.TempUncompress(a) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 filenames = []
                 for info in myzip.infolist():

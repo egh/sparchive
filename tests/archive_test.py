@@ -22,7 +22,7 @@ class TestArchive(TestCase):
 
     @staticmethod
     def assert_ziprz_filenames(path, filenames):
-        with rzip.TempUnrzip(path) as zippath:
+        with rzip.TempUncompress(path) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 assert_equal(set(filenames), set([ info.filename for info in myzip.infolist() ]))
 
@@ -36,7 +36,7 @@ class TestArchive(TestCase):
         a = Archive(apath)
         a.add_version([foo])
         a.add_version([bar])
-        with rzip.TempUnrzip(apath) as zippath:
+        with rzip.TempUncompress(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 assert_equal([[('foobar/foo', 4289425978)], [('foobar/bar', 1226766874)]],
                              Archive._zip_versions(myzip))
@@ -162,7 +162,7 @@ class TestArchive(TestCase):
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([foo])
-        with rzip.TempUnrzip(apath) as zippath:
+        with rzip.TempUncompress(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 info = myzip.infolist()[0]
                 assert_equal(info.date_time, (2001, 1, 1, 0, 0, 0))
@@ -175,7 +175,7 @@ class TestArchive(TestCase):
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([foo])
-        with rzip.TempUnrzip(apath) as zippath:
+        with rzip.TempUncompress(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 info = myzip.infolist()[0]
                 assert_equal(info.external_attr, 0o100644 << 16)
@@ -185,7 +185,7 @@ class TestArchive(TestCase):
         apath = mkstemppath()
         a = Archive(apath)
         a.add_version([foo])
-        with rzip.TempUnrzip(apath) as zippath:
+        with rzip.TempUncompress(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                 for info in myzip.infolist():
                     if info.filename == "versions/0/foobar/symlink":

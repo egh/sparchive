@@ -83,7 +83,7 @@ class Archive(object):
         for path in pathlist:
             if not(os.path.exists(path)):
                 raise Exception()
-        with rzip.TempUnrzip(self.archive_path) as zippath:
+        with rzip.TempUncompress(self.archive_path) as zippath:
             new_version = self.get_version_count(zippath)
             with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
                 for path in pathlist:
@@ -143,7 +143,7 @@ class Archive(object):
         if (not(os.path.exists(self.archive_path))):
             return None
         else:
-            with rzip.TempUnrzip(self.archive_path) as zippath:
+            with rzip.TempUncompress(self.archive_path) as zippath:
                 with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                     versions = Archive._zip_versions(myzip)
                     for (versionno, version) in enumerate(versions):
@@ -215,7 +215,7 @@ class Archive(object):
     def extract(self, dest, number=None):
         """Extract a version."""
         archivename = os.path.basename(self.archive_path).split('.')[0]
-        with rzip.TempUnrzip(self.archive_path) as zippath:
+        with rzip.TempUncompress(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 for info in myzip.infolist():
                     # call _split_path for every entry to ensure they
@@ -225,7 +225,7 @@ class Archive(object):
                         self._extract_entry(myzip, info, os.path.join(dest, archivename))
     
     def list(self):
-        with rzip.TempUnrzip(self.archive_path) as zippath:
+        with rzip.TempUncompress(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 retval = {}
                 for info in myzip.infolist():

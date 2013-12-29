@@ -12,7 +12,7 @@ def uncompress(compressed, uncompressed):
     args = ["xz", compressed, "-d", "-c"]
     subprocess.check_call(args, stdout=open(uncompressed, 'w'))
 
-class TempUnxz():
+class TempUncompress():
     def __init__(self, xz_path):
         self.xz_path = xz_path
 

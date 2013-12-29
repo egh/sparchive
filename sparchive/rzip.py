@@ -12,7 +12,7 @@ def uncompress(compressed, uncompressed):
     args = ["rzip", compressed, "-d", "-k", "-o", uncompressed]
     subprocess.check_call(args)
 
-class TempUnrzip():
+class TempUncompress():
     def __init__(self, rzip_path):
         self.rzip_path = rzip_path
 
