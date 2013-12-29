@@ -2,6 +2,7 @@ import datetime
 import os
 import time
 from sparchive.archive import Archive
+from sparchive import rzip
 
 class Filer(object):
     def __init__(self, basedir):
@@ -29,7 +30,7 @@ class Filer(object):
 
     def find_archive(self, pathname):
         """Find a new or old archive which should be used to archive this path."""
-        archivename = "%s.zip.rz"%(os.path.basename(os.path.normpath(pathname)))
+        archivename = "%s.zip.%s"%(os.path.basename(os.path.normpath(pathname)), rzip.ext)
         old_archive = self.find_file(archivename)
         if old_archive is not None:
             return Archive(old_archive)

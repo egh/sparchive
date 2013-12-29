@@ -2,6 +2,8 @@ import subprocess
 from sparchive import mkstemppath
 import os
 
+ext = "rz"
+
 def compress(uncompressed, compressed, level=6):
     args = ["rzip", uncompressed, "-k", "-%d"%(level), "-o", compressed]
     subprocess.check_call(args)
