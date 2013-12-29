@@ -37,7 +37,7 @@ def main(rawargs=None):
      elif args.command == "file":
           filer = Filer(path.abspath(args.root))
           for p in args.version_path:
-               result = filer.file(p)
+               result = filer.file(p, "zip.rz")
                if result[0]:
                     sys.stdout.write("%s archived in %s\n"%(p, result[2].archive_path))
                else:
