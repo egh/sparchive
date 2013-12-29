@@ -33,7 +33,7 @@ class TestArchive(TestCase):
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([foo])
         a.add_version([bar])
         with rzip.TempUncompress(apath) as zippath:
@@ -44,7 +44,7 @@ class TestArchive(TestCase):
     def test_has_version(self):
         foo = os.path.join('foobar', 'foo')
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([foo])
         assert_equal(0, a.has_version(foo))
         assert_equal(None, a.has_version(os.path.join('foobar', 'bar')))
@@ -52,7 +52,7 @@ class TestArchive(TestCase):
     def test_has_version_dir(self):
         foo = os.path.join('foobar')
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([foo])
         assert_equal(0, a.has_version(foo))
         assert_equal(None, a.has_version(os.path.join('foobar', 'bar')))
@@ -62,7 +62,7 @@ class TestArchive(TestCase):
         foo = os.path.join('foobar', 'foo')
         bar = os.path.join('foobar', 'bar')
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([foo])
         a.add_version([bar])
         TestArchive.assert_ziprz_filenames(apath, ["versions/0/foobar/foo", "versions/1/foobar/bar"])
@@ -70,7 +70,7 @@ class TestArchive(TestCase):
     def test_add_unicode_file(self):
         i = "“Iñtërnâtiônàlizætiøn”"
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([i])
         TestArchive.assert_ziprz_filenames(apath, ["versions/0/“Iñtërnâtiônàlizætiøn”"])
         xdir = mkdtemp()
@@ -82,7 +82,7 @@ class TestArchive(TestCase):
     def test_add_100_versions(self):
         foo = os.path.join('foobar', 'foo')
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         for n in range(0, 100):
             a.add_version([foo])
         TestArchive.assert_ziprz_filenames(apath, [ "versions/%d/foobar/foo"%(n) for n in range(0, 100) ])
@@ -90,7 +90,7 @@ class TestArchive(TestCase):
     def test_add_dir(self):
         dir = 'foobar'
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([dir])
         TestArchive.assert_ziprz_filenames(apath, ["versions/0/foobar/", "versions/0/foobar/symlink", "versions/0/foobar/bar", "versions/0/foobar/foo"])
 
@@ -102,7 +102,7 @@ class TestArchive(TestCase):
         os.chmod(foo, 0o644)
         os.chmod(bar, 0o7755)
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([foo])
         a.add_version([bar])
         a.add_version(['foobar'])
@@ -160,7 +160,7 @@ class TestArchive(TestCase):
         os.utime(foo, (978307200,  978307200))
         
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([foo])
         with rzip.TempUncompress(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
@@ -173,7 +173,7 @@ class TestArchive(TestCase):
         foo = os.path.join('foobar', 'foo')
         os.chmod(foo, 0o644)
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([foo])
         with rzip.TempUncompress(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
@@ -183,7 +183,7 @@ class TestArchive(TestCase):
     def test_is_entries(self):
         foo = os.path.join('foobar')
         apath = mkstemppath()
-        a = Archive(apath)
+        a = Archive(apath, rzip)
         a.add_version([foo])
         with rzip.TempUncompress(apath) as zippath:
             with ZipFile(zippath, mode='r', allowZip64=True) as myzip:

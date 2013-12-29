@@ -3,6 +3,7 @@ import argparse
 import sys
 from sparchive.archive import Archive
 from sparchive.filer import Filer
+from sparchive import rzip, xz
 from os import path
 
 def main(rawargs=None):
@@ -32,18 +33,18 @@ def main(rawargs=None):
 
      args = parser.parse_args(rawargs)
      if args.command == "addversion":
-          a = Archive(args.archive)
+          a = Archive(args.archive, rzip)
           a.add_version(args.version_path)
      elif args.command == "file":
-          filer = Filer(path.abspath(args.root))
+          filer = Filer(path.abspath(args.root), rzip)
           for p in args.version_path:
-               result = filer.file(p, "zip.rz")
+               result = filer.file(p)
                if result[0]:
                     sys.stdout.write("%s archived in %s\n"%(p, result[2].archive_path))
                else:
                     sys.stdout.write("%s is already archived in version %d of %s\n"%(p, result[1], result[2].archive_path))
      elif args.command == "list":
-          d = Archive(args.archive).list()
+          d = Archive(args.archive, rzip).list()
           for n in sorted(d.keys()):
                print("version %d:"%(n))
                for (p, info) in d[n]:
@@ -52,7 +53,7 @@ def main(rawargs=None):
                     mdatetime = datetime.fromtimestamp(mtime)
                     print("  %s  (%d, %s)"%(p, info.file_size, mdatetime.strftime("%Y-%m-%d %H:%M:%S")))
      elif args.command == "extract":
-          a = Archive(args.archive)
+          a = Archive(args.archive, rzip)
           a.extract(".", args.version)
 
 if __name__ == "__main__":

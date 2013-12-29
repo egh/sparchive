@@ -4,9 +4,10 @@ import time
 from sparchive.archive import Archive
 
 class Filer(object):
-    def __init__(self, basedir):
+    def __init__(self, basedir, compress_module):
         self.basedir = basedir
-        
+        self.compress_module = compress_module
+
     def find_file(self, filename):
         for root, dirs, files in os.walk(self.basedir):
             if (filename in files):
@@ -27,18 +28,18 @@ class Filer(object):
         times.reverse()
         return times[0]
 
-    def find_archive(self, pathname, ext):
+    def find_archive(self, pathname):
         """Find a new or old archive which should be used to archive this path."""
-        archivename = "%s.%s"%(os.path.basename(os.path.normpath(pathname)), ext)
+        archivename = "%s.zip.%s"%(os.path.basename(os.path.normpath(pathname)), self.compress_module.ext)
         old_archive = self.find_file(archivename)
         if old_archive is not None:
-            return Archive(old_archive)
+            return Archive(old_archive, self.compress_module)
         else:
             t = self.get_mtime(pathname)
-            return Archive(os.path.join(self.basedir, "%04d"%(t.tm_year), "%02d"%(t.tm_mon), archivename))
+            return Archive(os.path.join(self.basedir, "%04d"%(t.tm_year), "%02d"%(t.tm_mon), archivename), self.compress_module)
             
-    def file(self, path, ext):
-        archive = self.find_archive(path, ext)
+    def file(self, path):
+        archive = self.find_archive(path)
         old_version = archive.has_version(path)
         if old_version is not None:
             return (False, old_version, archive)

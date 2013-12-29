@@ -7,12 +7,12 @@ import binascii
 from zipfile import ZipFile, ZipInfo
 import time
 
-from sparchive import rzip
 from sparchive import mkstemppath
 
 class Archive(object):
-    def __init__(self, archive_path):
+    def __init__(self, archive_path, compress_module):
         self.archive_path = archive_path
+        self.compress_module = compress_module
 
     @staticmethod
     def get_mtime_as_utcdatetime(path):
@@ -83,13 +83,13 @@ class Archive(object):
         for path in pathlist:
             if not(os.path.exists(path)):
                 raise Exception()
-        with rzip.TempUncompress(self.archive_path) as zippath:
+        with self.compress_module.TempUncompress(self.archive_path) as zippath:
             new_version = self.get_version_count(zippath)
             with ZipFile(zippath, mode='a', allowZip64=True) as myzip:
                 for path in pathlist:
                     self._add_path(path, new_version, myzip)
             tmprzip = mkstemppath()
-            rzip.compress(zippath, tmprzip)
+            self.compress_module.compress(zippath, tmprzip)
         # perform sanity checks here
         os.rename(tmprzip, self.archive_path)
 
@@ -143,7 +143,7 @@ class Archive(object):
         if (not(os.path.exists(self.archive_path))):
             return None
         else:
-            with rzip.TempUncompress(self.archive_path) as zippath:
+            with self.compress_module.TempUncompress(self.archive_path) as zippath:
                 with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
                     versions = Archive._zip_versions(myzip)
                     for (versionno, version) in enumerate(versions):
@@ -215,7 +215,7 @@ class Archive(object):
     def extract(self, dest, number=None):
         """Extract a version."""
         archivename = os.path.basename(self.archive_path).split('.')[0]
-        with rzip.TempUncompress(self.archive_path) as zippath:
+        with self.compress_module.TempUncompress(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 for info in myzip.infolist():
                     # call _split_path for every entry to ensure they
@@ -225,7 +225,7 @@ class Archive(object):
                         self._extract_entry(myzip, info, os.path.join(dest, archivename))
     
     def list(self):
-        with rzip.TempUncompress(self.archive_path) as zippath:
+        with self.compress_module.TempUncompress(self.archive_path) as zippath:
             with ZipFile(zippath, 'r') as myzip:
                 retval = {}
                 for info in myzip.infolist():
