@@ -9,6 +9,7 @@ from os import path
 def main(rawargs=None):
      if rawargs is None: rawargs = sys.argv[1:]
      parser = argparse.ArgumentParser(description='sparkive - simple python archiver')
+     parser.add_argument('--xz', help='use xz, not rzip', action='store_true')
      subparsers = parser.add_subparsers()
 
      filer = subparsers.add_parser('file')
@@ -32,11 +33,14 @@ def main(rawargs=None):
      extract.set_defaults(command='extract')
 
      args = parser.parse_args(rawargs)
+     compress_mod = rzip
+     if args.xz:
+          compress_mod = xz
      if args.command == "addversion":
-          a = Archive(args.archive, rzip)
+          a = Archive(args.archive, compress_mod)
           a.add_version(args.version_path)
      elif args.command == "file":
-          filer = Filer(path.abspath(args.root), rzip)
+          filer = Filer(path.abspath(args.root), compress_mod)
           for p in args.version_path:
                result = filer.file(p)
                if result[0]:
@@ -44,7 +48,7 @@ def main(rawargs=None):
                else:
                     sys.stdout.write("%s is already archived in version %d of %s\n"%(p, result[1], result[2].archive_path))
      elif args.command == "list":
-          d = Archive(args.archive, rzip).list()
+          d = Archive(args.archive, compress_mod).list()
           for n in sorted(d.keys()):
                print("version %d:"%(n))
                for (p, info) in d[n]:
@@ -53,7 +57,7 @@ def main(rawargs=None):
                     mdatetime = datetime.fromtimestamp(mtime)
                     print("  %s  (%d, %s)"%(p, info.file_size, mdatetime.strftime("%Y-%m-%d %H:%M:%S")))
      elif args.command == "extract":
-          a = Archive(args.archive, rzip)
+          a = Archive(args.archive, compress_mod)
           a.extract(".", args.version)
 
 if __name__ == "__main__":
