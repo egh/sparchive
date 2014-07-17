@@ -91,7 +91,7 @@ class Archive(object):
             tmprzip = mkstemppath()
             self.compress_module.compress(zippath, tmprzip)
         # perform sanity checks here
-        os.rename(tmprzip, self.archive_path)
+        shutil.move(tmprzip, self.archive_path)
 
     @staticmethod
     def parse_extra(info):
