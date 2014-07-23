@@ -1,12 +1,14 @@
 import datetime
 import time
+from sparchive.archive import Archive
 from sparchive.filer import Filer
 from sparchive import rzip
 from unittest import TestCase
-from nose.tools import assert_equal
+from nose.tools import *
 import os
 from os import path
 from tempfile import mkdtemp
+from zipfile import ZipFile
 
 class FilerTest(TestCase):
     def setUp(self):
@@ -35,11 +37,11 @@ class FilerTest(TestCase):
         olddir = os.getcwd()
         rootdir = mkdtemp()
         filer = Filer(rootdir, rzip)
-        try:
-            os.chdir(path.join('tests', 'fixtures'))
-            results = filer.file('foobar')
-            assert_equal(results[0], True)
-            assert_equal(results[1], 0)
-            assert(os.path.exists(os.path.join(rootdir, '2001', '01', 'foobar.zip.rz')))
-        finally:
-            os.chdir(olddir)
+        results = filer.file(path.join('tests', 'fixtures', 'foobar'))
+        assert_equal(results[0], True)
+        assert_equal(results[1], 0)
+        assert(os.path.exists(os.path.join(rootdir, '2001', '01', 'foobar.zip.rz')))
+        with rzip.TempUncompress(results[2].archive_path) as zippath:
+            with ZipFile(zippath, mode='r', allowZip64=True) as myzip:
+                for info in myzip.infolist():
+                    assert_true(info.filename.startswith("versions/0/foobar"))

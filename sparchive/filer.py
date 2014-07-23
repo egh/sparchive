@@ -39,10 +39,18 @@ class Filer(object):
             return Archive(os.path.join(self.basedir, "%04d"%(t.tm_year), "%02d"%(t.tm_mon), archivename), self.compress_module)
             
     def file(self, path):
+        normpath = os.path.normpath(os.path.abspath(path))
         archive = self.find_archive(path)
         old_version = archive.has_version(path)
         if old_version is not None:
             return (False, old_version, archive)
         else:
-            archive.add_version([path])
-            return (True, 0, archive)
+            # there is a better way
+            original_dir = os.getcwd()
+            try:
+                basename = os.path.basename(normpath)
+                os.chdir(os.path.dirname(normpath))
+                archive.add_version([basename])
+                return (True, 0, archive)
+            finally:
+                os.chdir(original_dir)
